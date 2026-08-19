@@ -51,6 +51,20 @@ export default function Journey() {
           },
         }
       );
+      // Timeline Line Animation
+      gsap.fromTo(
+        '.journey-line',
+        { scaleY: 0 },
+        {
+          scaleY: 1,
+          duration: 1.5,
+          ease: 'power3.inOut',
+          scrollTrigger: {
+            trigger: '.journey-grid',
+            start: 'top 75%',
+          },
+        }
+      );
     },
     { scope: sectionRef }
   );
@@ -75,7 +89,7 @@ export default function Journey() {
       {/* Experience & Education Grid */}
       <div className="journey-grid grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 relative">
         {/* Minimalist Timeline Line */}
-        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gray-200 transform -translate-x-1/2"></div>
+        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gray-200 transform -translate-x-1/2 journey-line origin-top"></div>
 
         {/* Experience Column */}
         <div className="lg:col-span-6 space-y-16">

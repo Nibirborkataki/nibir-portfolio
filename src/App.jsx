@@ -14,7 +14,7 @@ import Footer from './components/Footer';
 
 export default function App() {
   return (
-    <div className="bg-white text-gray-900 overflow-x-hidden flex flex-col min-h-screen">
+    <div className="bg-white text-gray-900 flex flex-col min-h-screen">
       {/* Particle Canvas on hover/mouse move */}
       <ParticleCanvas />
 
