@@ -125,7 +125,7 @@ export default function Journey() {
   <div className="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 group-hover:bg-black transition-colors duration-300"></div>
 
   <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">
-    Web Developer Intern
+    2024
   </p>
 
   <h3 className="text-xl md:text-2xl font-bold text-black mb-1">
