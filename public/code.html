@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Journey - Onyx &amp; Canvas</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-low": "#f3f3f3",
+                        "tertiary-fixed-dim": "#474747",
+                        "on-tertiary": "#e2e2e2",
+                        "on-secondary-container": "#1b1b1b",
+                        "outline": "#777777",
+                        "on-tertiary-fixed": "#ffffff",
+                        "tertiary-fixed": "#5e5e5e",
+                        "on-primary-container": "#ffffff",
+                        "surface-container": "#eeeeee",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-on-surface": "#f1f1f1",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#ababab",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#5e5e5e",
+                        "on-primary": "#e2e2e2",
+                        "error-container": "#ffdad6",
+                        "background": "#f9f9f9",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-primary-fixed-variant": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#e2e2e2",
+                        "secondary": "#5e5e5e",
+                        "tertiary-container": "#747474",
+                        "primary-container": "#3b3b3b",
+                        "on-tertiary-container": "#ffffff",
+                        "on-background": "#1b1b1b",
+                        "inverse-surface": "#303030",
+                        "on-secondary-fixed-variant": "#3b3b3b",
+                        "on-surface": "#1b1b1b",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#410002",
+                        "secondary-fixed": "#c6c6c6",
+                        "outline-variant": "#c6c6c6",
+                        "on-primary-fixed": "#ffffff",
+                        "on-surface-variant": "#474747",
+                        "secondary-container": "#d4d4d4",
+                        "primary-fixed-dim": "#474747",
+                        "surface-dim": "#dadada",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "inverse-primary": "#c6c6c6",
+                        "tertiary": "#3b3b3b",
+                        "surface": "#f9f9f9",
+                        "surface-bright": "#f9f9f9",
+                        "surface-container-high": "#e8e8e8",
+                        "primary-fixed": "#5e5e5e",
+                        "primary": "#000000"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Manrope", "sans-serif"],
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["3.5rem", { lineHeight: "1.1", letterSpacing: "-0.02em" }],
+                        "headline-lg": ["2rem", { lineHeight: "1.2", letterSpacing: "-0.01em" }],
+                        "title-lg": ["1.375rem", { lineHeight: "1.3" }],
+                        "body-lg": ["1rem", { lineHeight: "1.6" }],
+                        "label-sm": ["0.6875rem", { lineHeight: "1", letterSpacing: "0.05em" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; background-color: #f9f9f9; color: #1b1b1b; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        /* Tonal shift for sections */
+        .section-bg-alt { background-color: #f3f3f3; }
+        /* Ambient shadow */
+        .ambient-shadow { box-shadow: 0px 20px 40px rgba(27, 27, 27, 0.04); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 transition-all duration-300" id="topNav">
+<div class="flex justify-between items-center max-w-7xl mx-auto px-8 h-20">
+<a class="text-xl font-black tracking-tighter text-black dark:text-white" href="#">ONYX &amp; CANVAS</a>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-manrope text-sm tracking-tight uppercase font-bold text-neutral-400 dark:text-neutral-500 hover:text-black dark:hover:text-white transition-colors" href="#">Work</a>
+<a class="font-manrope text-sm tracking-tight uppercase font-bold text-black dark:text-white border-b-2 border-black dark:border-white pb-1" href="#">Skills</a>
+<a class="font-manrope text-sm tracking-tight uppercase font-bold text-neutral-400 dark:text-neutral-500 hover:text-black dark:hover:text-white transition-colors" href="#">About</a>
+<a class="font-manrope text-sm tracking-tight uppercase font-bold text-neutral-400 dark:text-neutral-500 hover:text-black dark:hover:text-white transition-colors" href="#">Contact</a>
+</div>
+<button class="hidden md:block bg-primary text-on-primary px-6 py-3 rounded text-sm font-bold uppercase tracking-widest hover:opacity-70 transition-opacity">
+                Hire Me
+            </button>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined text-3xl">menu</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-32 pb-24 px-6 md:px-12 max-w-7xl mx-auto w-full">
+<!-- Header Section -->
+<header class="mb-24">
+<p class="text-label-sm uppercase tracking-widest text-secondary mb-4">Curriculum Vitae</p>
+<h1 class="text-display-lg font-bold text-primary mb-8 max-w-3xl">The Professional Journey.</h1>
+<p class="text-body-lg text-on-surface-variant max-w-2xl">A chronological curation of experiences, roles, and academic foundations that have shaped my design philosophy and technical execution.</p>
+</header>
+<!-- Experience & Education Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 relative">
+<!-- Minimalist Timeline Line (Hidden on small screens, absolute in grid gap on large) -->
+<div class="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-outline-variant opacity-20 transform -translate-x-1/2"></div>
+<!-- Experience Column -->
+<div class="lg:col-span-6 space-y-16">
+<h2 class="text-headline-lg font-bold text-primary mb-12 flex items-center gap-4">
+<span class="material-symbols-outlined text-2xl text-secondary">work</span>
+                    Experience
+                </h2>
+<!-- Experience Item 1 -->
+<div class="group relative pl-8 border-l-2 border-transparent hover:border-primary transition-colors duration-300">
+<div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-surface-container-highest group-hover:bg-primary transition-colors duration-300"></div>
+<p class="text-label-sm text-secondary tracking-widest uppercase mb-2">2021 — Present</p>
+<h3 class="text-title-lg font-bold text-primary mb-1">Senior UI/UX Designer</h3>
+<p class="text-body-lg text-on-surface-variant font-medium mb-4">Studio Monolith, London</p>
+<ul class="text-body-lg text-on-surface-variant space-y-2 list-none">
+<li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-outline-variant before:rounded-sm">Led the design system architecture for enterprise financial tools, focusing on high-density data visualization.</li>
+<li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-outline-variant before:rounded-sm">Mentored a team of 4 junior designers, establishing rigorous critique and review processes.</li>
+</ul>
+</div>
+<!-- Experience Item 2 -->
+<div class="group relative pl-8 border-l-2 border-transparent hover:border-primary transition-colors duration-300">
+<div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-surface-container-highest group-hover:bg-primary transition-colors duration-300"></div>
+<p class="text-label-sm text-secondary tracking-widest uppercase mb-2">2018 — 2021</p>
+<h3 class="text-title-lg font-bold text-primary mb-1">Lead Product Designer</h3>
+<p class="text-body-lg text-on-surface-variant font-medium mb-4">Aero Dynamics, New York</p>
+<ul class="text-body-lg text-on-surface-variant space-y-2 list-none">
+<li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-outline-variant before:rounded-sm">Spearheaded the complete redesign of their flagship SaaS platform, resulting in a 40% increase in user retention.</li>
+<li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-outline-variant before:rounded-sm">Collaborated directly with engineering leads to ensure pixel-perfect implementation of complex interactive components.</li>
+</ul>
+</div>
+<!-- Experience Item 3 -->
+<div class="group relative pl-8 border-l-2 border-transparent hover:border-primary transition-colors duration-300">
+<div class="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-surface-container-highest group-hover:bg-primary transition-colors duration-300"></div>
+<p class="text-label-sm text-secondary tracking-widest uppercase mb-2">2015 — 2018</p>
+<h3 class="text-title-lg font-bold text-primary mb-1">Digital Designer</h3>
+<p class="text-body-lg text-on-surface-variant font-medium mb-4">Creative Agency X, Berlin</p>
+<ul class="text-body-lg text-on-surface-variant space-y-2 list-none">
+<li class="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-outline-variant before:rounded-sm">Designed award-winning marketing sites for global luxury brands.</li>
+</ul>
+</div>
+</div>
+<!-- Education Column -->
+<div class="lg:col-span-6 space-y-16">
+<h2 class="text-headline-lg font-bold text-primary mb-12 flex items-center gap-4">
+<span class="material-symbols-outlined text-2xl text-secondary">school</span>
+                    Education
+                </h2>
+<!-- Education Item 1 -->
+<div class="bg-surface-container-lowest p-8 rounded ambient-shadow hover:bg-surface-container-high transition-colors duration-300">
+<p class="text-label-sm text-secondary tracking-widest uppercase mb-2">2013 — 2015</p>
+<h3 class="text-title-lg font-bold text-primary mb-2">Master of Arts in Interaction Design</h3>
+<p class="text-body-lg text-on-surface-variant">Royal College of Art, London</p>
+<p class="text-body-lg text-on-surface-variant mt-4 text-sm">Focus on tangible interfaces, speculative design, and human-computer interaction in spatial environments. Graduated with Distinction.</p>
+</div>
+<!-- Education Item 2 -->
+<div class="bg-surface-container-lowest p-8 rounded ambient-shadow hover:bg-surface-container-high transition-colors duration-300">
+<p class="text-label-sm text-secondary tracking-widest uppercase mb-2">2009 — 2013</p>
+<h3 class="text-title-lg font-bold text-primary mb-2">Bachelor of Fine Arts in Graphic Design</h3>
+<p class="text-body-lg text-on-surface-variant">Rhode Island School of Design, Providence</p>
+<p class="text-body-lg text-on-surface-variant mt-4 text-sm">Foundational studies in typography, layout, color theory, and digital media. Honors thesis on the evolution of digital typography.</p>
+</div>
+<!-- Certification Item -->
+<div class="bg-surface-container-lowest p-8 rounded ambient-shadow hover:bg-surface-container-high transition-colors duration-300">
+<p class="text-label-sm text-secondary tracking-widest uppercase mb-2">2020</p>
+<h3 class="text-title-lg font-bold text-primary mb-2">Certified Design System Architect</h3>
+<p class="text-body-lg text-on-surface-variant">Design Systems Institute</p>
+</div>
+</div>
+</div>
+<!-- Download Resume CTA -->
+<div class="mt-32 border-t border-outline-variant/20 pt-16 flex flex-col md:flex-row items-center justify-between gap-8">
+<div>
+<h3 class="text-title-lg font-bold text-primary mb-2">Full Resume</h3>
+<p class="text-body-lg text-on-surface-variant">Download a comprehensive PDF version of my experience.</p>
+</div>
+<button class="flex items-center gap-2 bg-surface-container-highest text-on-surface px-6 py-3 rounded text-sm font-bold uppercase tracking-widest hover:bg-primary hover:text-on-primary transition-colors duration-300">
+<span class="material-symbols-outlined text-lg">download</span>
+                Download PDF
+            </button>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-12 bg-neutral-50 dark:bg-neutral-950 mt-auto">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+<span class="font-black text-lg text-black dark:text-white">ONYX &amp; CANVAS</span>
+<span class="font-manrope text-[10px] tracking-[0.05em] uppercase text-black dark:text-white">© 2024 ONYX &amp; CANVAS. ALL RIGHTS RESERVED.</span>
+<div class="flex gap-6">
+<a class="font-manrope text-[10px] tracking-[0.05em] uppercase text-neutral-400 hover:text-black dark:hover:text-white transition-colors" href="#">Privacy</a>
+<a class="font-manrope text-[10px] tracking-[0.05em] uppercase text-neutral-400 hover:text-black dark:hover:text-white transition-colors" href="#">Terms</a>
+<a class="font-manrope text-[10px] tracking-[0.05em] uppercase text-neutral-400 hover:text-black dark:hover:text-white transition-colors" href="#">Archive</a>
+</div>
+</div>
+</footer>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-16 bg-white dark:bg-black z-50 border-t border-neutral-100 dark:border-neutral-900 shadow-[0_-10px_30px_rgba(0,0,0,0.03)]">
+<a class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-950 tap-highlight-transparent active:scale-90 transition-transform p-2 rounded-sm" href="#">
+<span class="material-symbols-outlined mb-1">grid_view</span>
+<span class="font-manrope text-[10px] uppercase tracking-widest font-bold">Work</span>
+</a>
+<a class="flex flex-col items-center justify-center text-black dark:text-white bg-neutral-100 dark:bg-neutral-900 rounded-sm px-4 py-1 tap-highlight-transparent active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined mb-1">psychology</span>
+<span class="font-manrope text-[10px] uppercase tracking-widest font-bold">Skills</span>
+</a>
+<a class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-950 tap-highlight-transparent active:scale-90 transition-transform p-2 rounded-sm" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-manrope text-[10px] uppercase tracking-widest font-bold">About</span>
+</a>
+<a class="flex flex-col items-center justify-center text-neutral-400 dark:text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-950 tap-highlight-transparent active:scale-90 transition-transform p-2 rounded-sm" href="#">
+<span class="material-symbols-outlined mb-1">mail</span>
+<span class="font-manrope text-[10px] uppercase tracking-widest font-bold">Contact</span>
+</a>
+</nav>
+</body></html>

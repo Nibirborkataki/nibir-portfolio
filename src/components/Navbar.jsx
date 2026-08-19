@@ -52,6 +52,10 @@ export default function Navbar() {
       href: '#skills',
     },
     {
+      label: 'Journey',
+      href: '#journey',
+    },
+    {
       label: 'Reviews',
       href: '#reviews',
     },
@@ -150,7 +154,7 @@ export default function Navbar() {
       {/* Mobile Hamburger Button */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="md:hidden p-2 text-black hover:text-neutral-600 focus:outline-none"
+        className="md:hidden p-2 text-black hover:text-neutral-600 focus:outline-none relative z-50"
         aria-label="Toggle Navigation Menu"
       >
         {mobileMenuOpen ? (
@@ -161,23 +165,23 @@ export default function Navbar() {
       </button>
 
       {/* Mobile Dropdown Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden w-full bg-white border-b border-gray-200 px-6 py-4 mt-2 transition-all shadow-lg rounded-b-lg">
-          <ul className="flex flex-col space-y-3">
-            {navLinks.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="block text-sm uppercase tracking-wide font-semibold text-gray-700 py-1 hover:text-black transition"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <div 
+        className={`md:hidden fixed inset-0 bg-white z-40 flex flex-col items-center justify-center transition-all duration-500 ease-in-out ${mobileMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}
+      >
+        <ul className="flex flex-col space-y-8 text-center">
+          {navLinks.map((link) => (
+            <li key={link.label}>
+              <a
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-2xl uppercase tracking-widest font-bold text-gray-800 py-2 hover:text-black hover:scale-110 transition-transform"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </header>
   );
 }

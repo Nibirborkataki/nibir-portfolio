@@ -7,6 +7,7 @@ import About from './components/About';
 import Stats from './components/Stats';
 import InfiniteMarquee from './components/InfiniteMarquee';
 import SkillsBento from './components/SkillsBento';
+import Journey from './components/Journey';
 import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
@@ -37,6 +38,9 @@ export default function App() {
 
       {/* Bento Grid Skills & Capabilities */}
       <SkillsBento />
+
+      {/* The Professional Journey */}
+      <Journey />
 
       {/* Testimonials / Kind Words */}
       <Testimonials />

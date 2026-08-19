@@ -5,7 +5,22 @@ import { useGSAP } from '@gsap/react';
 
 gsap.registerPlugin(ScrollTrigger);
 
-import resumePdf from '../assets/Nibir_Borkataki_Resume_.pdf';
+const WhatsappIcon = ({ size = 20 }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17.498 14.382c-.301-.15-1.767-.867-2.04-.966-.273-.101-.473-.15-.673.15-.197.295-.771.964-.944 1.162-.175.195-.349.21-.646.061-.3-.15-1.265-.462-2.406-1.485-.888-.795-1.484-1.77-1.66-2.07-.174-.3-.019-.465.13-.615.136-.135.301-.345.451-.523.146-.181.194-.301.297-.496.098-.205.048-.39-.029-.542-.074-.15-.673-1.62-.922-2.206-.24-.579-.487-.501-.673-.51l-.573-.01c-.198 0-.52.074-.792.359-.273.3-1.045 1.02-1.045 2.475s1.07 2.865 1.219 3.075c.149.21 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.767-.721 2.016-1.42.248-.7.248-1.295.173-1.42-.074-.124-.272-.198-.57-.345z" />
+    <path d="M11.953 2a10 10 0 0 0-8.623 15.02L2 22l5.066-1.33A10 10 0 1 0 11.953 2z" />
+  </svg>
+);
 
 export default function Hero() {
   const containerRef = useRef(null);
@@ -101,17 +116,13 @@ export default function Hero() {
         </p>
         <div className="flex flex-wrap gap-4 mt-8 justify-center lg:justify-start">
           <a
-            href="#contact"
-            className="hero-btn inline-block px-8 py-3 bg-black text-white rounded-sm hover:-translate-y-1 hover:shadow-lg transition-all text-sm font-semibold uppercase tracking-wider"
+            href="https://wa.me/918822546375"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hero-btn inline-flex items-center gap-2 px-8 py-3 bg-black text-white rounded-sm hover:-translate-y-1 hover:shadow-lg transition-all text-sm font-semibold uppercase tracking-wider"
           >
-            Contact Me
-          </a>
-          <a
-            href={resumePdf}
-            download="Nibir_Borkataki_Resume.pdf"
-            className="hero-btn inline-block px-8 py-3 bg-white text-black border border-black rounded-sm hover:-translate-y-1 hover:shadow-lg transition-all text-sm font-semibold uppercase tracking-wider"
-          >
-            Download CV
+            Hire Me
+            <WhatsappIcon size={18} />
           </a>
         </div>
       </div>

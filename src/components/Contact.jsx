@@ -141,7 +141,7 @@ export default function Contact() {
       {/* Header Section */}
       <div className="contact-header mb-20">
         <p className="text-xs uppercase tracking-[0.2em] font-bold text-gray-500 mb-6">
-          Connect / 04
+          Connect / 05
         </p>
 
         <h2 className="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05]">

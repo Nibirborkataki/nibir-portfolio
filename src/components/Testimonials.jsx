@@ -58,11 +58,11 @@ export default function Testimonials() {
     <section
       id="reviews"
       ref={sectionRef}
-      className="max-w-[1920px] mx-auto px-6 md:px-12 py-24 bg-white mt-12 mb-12"
+      className="max-w-7xl mx-auto px-6 md:px-12 py-24 bg-white mt-12 mb-12"
     >
       <div className="testimonials-header mb-16">
         <span className="font-label text-[0.6875rem] uppercase tracking-[0.15em] font-semibold text-gray-500">
-          Testimonials / 03
+          Testimonials / 04
         </span>
         <h2 className="text-6xl md:text-7xl font-bold tracking-tighter text-black mt-2">
           Kind Words
