@@ -88,17 +88,30 @@ export default function CustomCursor() {
         textNodes.forEach(node => {
           if (!node.nodeValue.trim()) return;
           const fragment = document.createDocumentFragment();
-          const chars = node.nodeValue.split('');
-          chars.forEach(char => {
-            if (char === ' ') {
-              fragment.appendChild(document.createTextNode(' '));
+          
+          // Split by words first to prevent character breaking across lines
+          const words = node.nodeValue.split(/(\s+)/); // Keep spaces as separate tokens
+          
+          words.forEach(word => {
+            if (word.trim() === '') {
+              // It's just space(s)
+              fragment.appendChild(document.createTextNode(word));
             } else {
-              const span = document.createElement('span');
-              span.className = 'fisheye-char inline-block origin-bottom pointer-events-none transition-colors duration-200';
-              span.textContent = char;
-              fragment.appendChild(span);
+              // It's a word, wrap it in a span with whitespace-nowrap
+              const wordSpan = document.createElement('span');
+              wordSpan.className = 'inline-block whitespace-nowrap';
+              
+              const chars = word.split('');
+              chars.forEach(char => {
+                const charSpan = document.createElement('span');
+                charSpan.className = 'fisheye-char inline-block origin-bottom pointer-events-none transition-colors duration-200';
+                charSpan.textContent = char;
+                wordSpan.appendChild(charSpan);
+              });
+              fragment.appendChild(wordSpan);
             }
           });
+          
           node.parentNode.replaceChild(fragment, node);
         });
       });

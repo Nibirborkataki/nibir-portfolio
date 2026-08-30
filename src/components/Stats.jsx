@@ -1,48 +1,78 @@
-import React, { useRef, useState } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import React, { useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger);
 
 function StatItem({ target, label }) {
-  const [count, setCount] = useState(0);
   const elementRef = useRef(null);
+  const counterRef = useRef(null);
 
   useGSAP(
     () => {
       const el = elementRef.current;
-      const counterObj = { val: 0 };
+      const counter = counterRef.current;
 
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 70%',
-        toggleActions: 'play none none reverse',
-        onEnter: () => {
-          gsap.to(counterObj, {
-            val: target,
-            duration: 1.4,
-            ease: 'power2.out',
-            onUpdate: () => {
-              setCount(Math.floor(counterObj.val));
-            },
-          });
-        },
-        onLeaveBack: () => {
-          counterObj.val = 0;
-          setCount(0);
+      const counterObj = { value: 0 };
+
+      gsap.to(counterObj, {
+        value: target,
+        duration: 1.4,
+        ease: "power2.out",
+
+        scrollTrigger: {
+          trigger: el,
+          start: "top 70%",
+          toggleActions: "play none none reverse",
+
+          onEnter: () => {
+            gsap.to(counterObj, {
+              value: target,
+              duration: 1.4,
+              ease: "power2.out",
+              overwrite: true,
+              onUpdate: () => {
+                counter.textContent = `${Math.floor(counterObj.value)}+`;
+              },
+            });
+          },
+
+          onLeaveBack: () => {
+            gsap.killTweensOf(counterObj);
+
+            gsap.to(counterObj, {
+              value: 0,
+              duration: 0.3,
+              ease: "power2.out",
+              onUpdate: () => {
+                counter.textContent = `${Math.floor(counterObj.value)}+`;
+              },
+            });
+          },
         },
       });
     },
-    { scope: elementRef }
+    {
+      scope: elementRef,
+    }
   );
 
   return (
-    <div ref={elementRef} className="stat-card flex flex-col items-center">
-      <h2 className="text-5xl font-bold text-gray-900 counter">
-        {count}+
+    <div
+      ref={elementRef}
+      className="stat-card flex flex-col items-center"
+    >
+      <h2
+        ref={counterRef}
+        className="text-5xl font-bold text-gray-900"
+      >
+        0+
       </h2>
-      <p className="text-lg text-gray-600 mt-2">{label}</p>
+
+      <p className="text-lg text-gray-600 mt-2">
+        {label}
+      </p>
     </div>
   );
 }
@@ -52,34 +82,52 @@ export default function Stats() {
 
   useGSAP(
     () => {
-      gsap.from('.stat-card', {
+      gsap.from(".stat-card", {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 70%',
-          toggleActions: 'play none none reverse',
+          start: "top 70%",
+          toggleActions: "play none none reverse",
         },
         y: 35,
         scale: 0.95,
         opacity: 0,
         stagger: 0.12,
         duration: 0.7,
-        ease: 'power3.out',
+        ease: "power3.out",
       });
     },
-    { scope: sectionRef }
+    {
+      scope: sectionRef,
+    }
   );
 
   const stats = [
-    { target: 10, label: 'Satisfied Clients' },
-    { target: 10, label: 'Completed Projects' },
-    { target: 15, label: 'Customer Reviews' },
+    {
+      target: 7,
+      label: "Satisfied Clients",
+    },
+    {
+      target: 8,
+      label: "Completed Projects",
+    },
+    {
+      target: 5,
+      label: "Customer Reviews",
+    },
   ];
 
   return (
-    <section ref={sectionRef} className="py-20 text-center">
+    <section
+      ref={sectionRef}
+      className="py-20 text-center"
+    >
       <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         {stats.map((stat, i) => (
-          <StatItem key={i} target={stat.target} label={stat.label} />
+          <StatItem
+            key={i}
+            target={stat.target}
+            label={stat.label}
+          />
         ))}
       </div>
     </section>

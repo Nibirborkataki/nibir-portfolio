@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Github, Linkedin, Instagram, Facebook } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Github, Linkedin, Instagram, Facebook, ArrowUp } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 
@@ -22,6 +22,19 @@ const WhatsappIcon = ({ size = 20 }) => (
 
 export default function SocialSidebar() {
   const sidebarRef = useRef(null);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   useGSAP(
     () => {
@@ -45,56 +58,67 @@ export default function SocialSidebar() {
   );
 
   return (
-    <aside
-      ref={sidebarRef}
-      className="hidden md:flex fixed right-4 md:right-6 top-24 flex-col space-y-4 z-40"
-      aria-label="Social media channels"
-    >
-      <a
-        href="https://wa.me/918822546375"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
-        aria-label="WhatsApp"
+    <>
+      <aside
+        ref={sidebarRef}
+        className="hidden md:flex fixed right-4 md:right-6 top-24 flex-col space-y-4 z-40"
+        aria-label="Social media channels"
       >
-        <WhatsappIcon size={20} />
-      </a>
-      <a
-        href="https://www.facebook.com/nibir.borkataki"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
-        aria-label="Facebook"
+        <a
+          href="https://wa.me/918822546375"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
+          aria-label="WhatsApp"
+        >
+          <WhatsappIcon size={20} />
+        </a>
+        <a
+          href="https://www.facebook.com/nibir.borkataki"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
+          aria-label="Facebook"
+        >
+          <Facebook size={20} />
+        </a>
+        <a
+          href="https://www.instagram.com/nibirborkataki/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
+          aria-label="Instagram"
+        >
+          <Instagram size={20} />
+        </a>
+        <a
+          href="https://github.com/nibirborkataki"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
+          aria-label="GitHub"
+        >
+          <Github size={20} />
+        </a>
+        <a
+          href="https://www.linkedin.com/in/nibir-borkataki-a39919254/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="social-icon-link text-gray-700 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
+          aria-label="LinkedIn"
+        >
+          <Linkedin size={20} />
+        </a>
+      </aside>
+
+      {/* Scroll to Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed right-6 bottom-8 z-50 p-3 bg-black text-white rounded-full shadow-lg transform transition-all duration-300 hover:bg-gray-800 hover:-translate-y-1 ${showScrollTop ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-10 invisible'}`}
+        aria-label="Scroll to top"
       >
-        <Facebook size={20} />
-      </a>
-      <a
-        href="https://www.instagram.com/nibirborkataki/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
-        aria-label="Instagram"
-      >
-        <Instagram size={20} />
-      </a>
-      <a
-        href="https://github.com/nibirborkataki"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-link text-gray-800 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
-        aria-label="GitHub"
-      >
-        <Github size={20} />
-      </a>
-      <a
-        href="https://www.linkedin.com/in/nibir-borkataki-a39919254/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="social-icon-link text-gray-700 hover:text-black text-2xl transform hover:scale-110 transition-all p-1"
-        aria-label="LinkedIn"
-      >
-        <Linkedin size={20} />
-      </a>
-    </aside>
+        <ArrowUp size={24} />
+      </button>
+    </>
   );
 }
