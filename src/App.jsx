@@ -1,4 +1,5 @@
 import React from 'react';
+import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
 import ParticleCanvas from './components/ParticleCanvas';
 import SocialSidebar from './components/SocialSidebar';
@@ -15,6 +16,7 @@ import Footer from './components/Footer';
 export default function App() {
   return (
     <div className="bg-white text-gray-900 flex flex-col min-h-screen">
+      <CustomCursor />
       {/* Particle Canvas on hover/mouse move */}
       <ParticleCanvas />
 

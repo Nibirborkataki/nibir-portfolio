@@ -16,7 +16,7 @@ function StatItem({ target, label }) {
 
       ScrollTrigger.create({
         trigger: el,
-        start: 'top 85%',
+        start: 'top 70%',
         toggleActions: 'play none none reverse',
         onEnter: () => {
           gsap.to(counterObj, {
@@ -55,7 +55,7 @@ export default function Stats() {
       gsap.from('.stat-card', {
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top 85%',
+          start: 'top 70%',
           toggleActions: 'play none none reverse',
         },
         y: 35,

@@ -7,14 +7,13 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navRef = useRef(null);
 
-  // Initial Navbar Animation
+  // Initial Navbar Animation & Cursor Setup
   useGSAP(
     () => {
       const tl = gsap.timeline({
         defaults: {
           ease: 'power3.out',
         },
-
         onComplete: () => {
           gsap.set(['.nav-logo', '.nav-item'], {
             clearProps: 'opacity,transform',
@@ -36,6 +35,7 @@ export default function Navbar() {
         },
         '-=0.3'
       );
+
     },
     {
       scope: navRef,
@@ -43,76 +43,22 @@ export default function Navbar() {
   );
 
   const navLinks = [
-    {
-      label: 'Home',
-      href: '#home',
-    },
-    {
-      label: 'Skill',
-      href: '#skills',
-    },
-    {
-      label: 'Journey',
-      href: '#journey',
-    },
-    {
-      label: 'Reviews',
-      href: '#reviews',
-    },
-    {
-      label: 'Contact',
-      href: '#contact',
-    },
+    { label: 'Home', href: '#home' },
+    { label: 'Skill', href: '#skills' },
+    { label: 'Journey', href: '#journey' },
+    { label: 'Reviews', href: '#reviews' },
+    { label: 'Contact', href: '#contact' },
   ];
 
-  // X-Axis 3D Flip Animation
-  const handleFlipEnter = (e) => {
-    const el = e.currentTarget;
-
-    // Stop any previous animation
-    gsap.killTweensOf(el);
-
-    // Always start from the normal position
-    gsap.set(el, {
-      rotationX: 0,
-      transformPerspective: 800,
-      transformOrigin: 'center center',
-    });
-
-    // Flip around X-axis
-    gsap.to(el, {
-      rotationX: 360,
-      duration: 0.7,
-      ease: 'power2.inOut',
-
-      // Reset after completing the animation
-      onComplete: () => {
-        gsap.set(el, {
-          rotationX: 0,
-        });
-      },
-    });
-  };
-
-  const handleFlipLeave = (e) => {
-    const el = e.currentTarget;
-
-    // Stop any current animation
-    gsap.killTweensOf(el);
-
-    // Return smoothly to normal X-axis position
-    gsap.to(el, {
-      rotationX: 0,
-      duration: 0.35,
-      ease: 'power2.out',
-    });
-  };
+  // Global CustomCursor component handles the fisheye effect via the .fisheye-char class
 
   return (
     <header
       ref={navRef}
       className="relative w-full flex flex-col md:flex-row items-center justify-between px-6 md:px-8 py-4 bg-white"
     >
+
+
       {/* Logo */}
       <div className="nav-logo bg-gray-900 px-6 h-10 flex items-center justify-center text-white md:mr-5 rounded-sm">
         <h1 className="text-xl font-bold tracking-wider">
@@ -121,30 +67,19 @@ export default function Navbar() {
       </div>
 
       {/* Desktop Navigation */}
-      <nav
-        className="hidden md:block"
-        style={{
-          perspective: 800,
-        }}
-      >
+      <nav className="hidden md:block z-10">
         <ul className="flex space-x-6 md:space-x-8 py-2 px-4 pr-12 md:pr-16">
           {navLinks.map((link) => (
-            <li
-              key={link.label}
-              className="nav-item"
-            >
+            <li key={link.label} className="nav-item">
               <a
                 href={link.href}
-                onMouseEnter={handleFlipEnter}
-                onMouseLeave={handleFlipLeave}
-                className="inline-block text-sm md:text-base uppercase tracking-wide text-gray-700 hover:text-black font-medium transition-colors cursor-pointer py-1"
-                style={{
-                  transformStyle: 'preserve-3d',
-                  transformOrigin: 'center center',
-                  willChange: 'transform',
-                }}
+                className="inline-flex text-sm md:text-base uppercase tracking-wide text-gray-700 font-medium py-1"
               >
-                {link.label}
+                {link.label.split('').map((char, i) => (
+                  <span key={i} className="fisheye-char inline-block origin-bottom pointer-events-none transition-colors duration-200">
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
               </a>
             </li>
           ))}

@@ -51,20 +51,56 @@ export default function Journey() {
           },
         }
       );
-      // Timeline Line Animation
-      gsap.fromTo(
-        '.journey-line',
-        { scaleY: 0 },
-        {
-          scaleY: 1,
-          duration: 1.5,
-          ease: 'power3.inOut',
-          scrollTrigger: {
-            trigger: '.journey-grid',
-            start: 'top 75%',
-          },
+      // Timeline Progress Line & Circle Animation
+      const timelineTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.journey-grid',
+          start: 'top 60%',
+          end: 'bottom 40%',
+          scrub: 1,
         }
-      );
+      });
+
+      timelineTL.to('.journey-progress-line', {
+        scaleY: 1,
+        ease: 'none',
+      }, 0)
+      .to('.journey-progress-circle', {
+        top: '100%',
+        ease: 'none',
+      }, 0);
+
+      // Bullet points darken as they are scrolled past
+      const bullets = gsap.utils.toArray('.journey-bullet');
+      bullets.forEach((bullet) => {
+        gsap.to(bullet, {
+          backgroundColor: '#000000',
+          duration: 0.3,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: bullet,
+            start: 'top 55%', // Slightly offset to match the circle's leading edge
+            toggleActions: 'play none none reverse',
+          }
+        });
+      });
+
+      // Education cards focus dynamically as circle goes down
+      const eduCards = gsap.utils.toArray('.edu-card');
+      eduCards.forEach((card) => {
+        gsap.to(card, {
+          boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
+          borderColor: '#e5e7eb', // gray-200 equivalent
+          duration: 0.4,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 60%',
+            end: 'bottom 40%',
+            toggleActions: 'play reverse play reverse',
+          }
+        });
+      });
     },
     { scope: sectionRef }
   );
@@ -88,8 +124,13 @@ export default function Journey() {
 
       {/* Experience & Education Grid */}
       <div className="journey-grid grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 relative">
-        {/* Minimalist Timeline Line */}
-        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gray-200 transform -translate-x-1/2 journey-line origin-top"></div>
+        {/* Minimalist Timeline Line Container */}
+        <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-[2px] bg-gray-200 transform -translate-x-1/2">
+          {/* Animated Dark Line */}
+          <div className="journey-progress-line absolute top-0 left-0 w-full bg-gray-800 origin-top h-full" style={{ transform: 'scaleY(0)' }}></div>
+          {/* Moving Circle */}
+          <div className="journey-progress-circle absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-gray-800 rounded-full shadow-[0_0_0_4px_white,0_0_0_6px_rgba(31,41,55,0.1)] z-10" style={{ top: '0%' }}></div>
+        </div>
 
         {/* Experience Column */}
         <div className="lg:col-span-6 space-y-16">
@@ -99,8 +140,8 @@ export default function Journey() {
           </h2>
 
           {/* Experience Item 1 */}
-          <div className="journey-item group relative pl-8 border-l-2 border-transparent hover:border-black transition-colors duration-300">
-            <div className="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 group-hover:bg-black transition-colors duration-300"></div>
+          <div className="journey-item group relative pl-8 border-l-2 border-transparent transition-colors duration-300">
+            <div className="journey-bullet absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 transition-colors duration-300"></div>
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2025 — Present</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-1">Software Development Engineer 2</h3>
             <p className="text-base text-gray-600 font-medium mb-4">AlegraLabs GmbH, Guwahati</p>
@@ -112,8 +153,8 @@ export default function Journey() {
           </div>
 
           {/* Experience Item 2 */}
-          <div className="journey-item group relative pl-8 border-l-2 border-transparent hover:border-black transition-colors duration-300">
-            <div className="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 group-hover:bg-black transition-colors duration-300"></div>
+          <div className="journey-item group relative pl-8 border-l-2 border-transparent transition-colors duration-300">
+            <div className="journey-bullet absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 transition-colors duration-300"></div>
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2025 - present</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-1">Freelance Full-Stack Developer | Remote</h3>
             <p className="text-base text-gray-600 font-medium mb-4">Sanskritir Dapoon</p>
@@ -125,8 +166,8 @@ export default function Journey() {
           </div>
 
           {/* Experience Item 3 */}
-          <div className="journey-item group relative pl-8 border-l-2 border-transparent hover:border-black transition-colors duration-300">
-            <div className="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 group-hover:bg-black transition-colors duration-300"></div>
+          <div className="journey-item group relative pl-8 border-l-2 border-transparent transition-colors duration-300">
+            <div className="journey-bullet absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 transition-colors duration-300"></div>
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2024 — 2025</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-1">MIS Executive</h3>
             <p className="text-base text-gray-600 font-medium mb-4">Flipkart, Guwahati</p>
@@ -135,8 +176,8 @@ export default function Journey() {
               <li className="relative pl-4 before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-gray-400 before:rounded-sm">Developed automation scripts to streamline reportgeneration and imporove operational efficiency.</li>
             </ul>
           </div>
-          <div className="journey-item group relative pl-8 border-l-2 border-transparent hover:border-black transition-colors duration-300">
-  <div className="absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 group-hover:bg-black transition-colors duration-300"></div>
+          <div className="journey-item group relative pl-8 border-l-2 border-transparent transition-colors duration-300">
+  <div className="journey-bullet absolute -left-[5px] top-2 w-2 h-2 rounded-full bg-gray-300 transition-colors duration-300"></div>
 
   <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">
     2024
@@ -170,7 +211,7 @@ export default function Journey() {
           </h2>
 
           {/* Education Item 1 */}
-          <div className="journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
+          <div className="edu-card journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2021 — 2023</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-2">Master of Science in Information Technology</h3>
             <p className="text-base text-gray-600 font-medium">Gauhati University</p>
@@ -178,7 +219,7 @@ export default function Journey() {
           </div>
 
           {/* Education Item 2 */}
-          <div className="journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
+          <div className="edu-card journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2018 — 2021</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-2">Bachelor of Science in Information technology</h3>
             <p className="text-base text-gray-600 font-medium">Lalit Chandra Bharali College</p>
@@ -186,14 +227,14 @@ export default function Journey() {
           </div>
 
           {/* Certification Item */}
-          <div className="journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
+          <div className="edu-card journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2018</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-2">Higher Secondary</h3>
             <p className="text-base text-gray-600 font-medium">Kendriya Vidyalaya Maligaon</p>
             <p className="text-sm text-gray-500 mt-4 leading-relaxed">Developed a foundation in Computer Science and programming while studying the Science stream. This was where I began exploring programming concepts and developed my interest in technology and software development.</p>
           </div>
           {/* Education Item 4 */}
-          <div className="journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
+          <div className="edu-card journey-item bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 rounded hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-gray-200 transition-all duration-300">
             <p className="text-[0.6875rem] font-bold text-gray-500 tracking-widest uppercase mb-2">2015</p>
             <h3 className="text-xl md:text-2xl font-bold text-black mb-2">Higher School Education | CBSE </h3>
             <p className="text-base text-gray-600 font-medium">Gyan Educational Institute</p>
