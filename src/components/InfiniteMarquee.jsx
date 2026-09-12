@@ -1,11 +1,16 @@
 import React, { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function InfiniteMarquee() {
   const containerRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const cursorRef = useRef(null);
+  const textRef = useRef(null);
   
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -59,6 +64,34 @@ export default function InfiniteMarquee() {
     gsap.set(cursorRef.current, { xPercent: -50, yPercent: -50 });
   }, []);
 
+  useGSAP(() => {
+    const mm = gsap.matchMedia();
+
+    mm.add("(max-width: 767px)", () => {
+      // Clear any x translation that might have been applied on desktop
+      gsap.set(textRef.current, { clearProps: "x" });
+
+      // Mobile only: horizontal move on vertical scroll
+      gsap.to(textRef.current, {
+        x: () => -(textRef.current.scrollWidth - window.innerWidth),
+        ease: "none",
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        }
+      });
+    });
+
+    mm.add("(min-width: 768px)", () => {
+       // Make sure to reset transform if resizing back to desktop
+       gsap.set(textRef.current, { clearProps: "all" });
+    });
+
+    return () => mm.revert();
+  }, { scope: containerRef });
+
   return (
     <section
       id="horizontal-scroll"
@@ -81,10 +114,10 @@ export default function InfiniteMarquee() {
 
       <div 
         ref={scrollContainerRef}
-        className="w-full flex items-center overflow-x-auto no-scrollbar"
+        className="w-full flex items-center overflow-hidden md:overflow-x-auto no-scrollbar"
         style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
       >
-        <h1 className="whitespace-nowrap text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight text-gray-900 pl-4 md:pl-8 leading-none py-4 pr-8">
+        <h1 ref={textRef} className="whitespace-nowrap text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold uppercase tracking-tight text-gray-900 pl-4 md:pl-8 leading-none py-4 pr-8 inline-block">
           {marqueeText}
         </h1>
       </div>

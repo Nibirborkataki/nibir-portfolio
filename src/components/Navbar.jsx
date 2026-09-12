@@ -55,7 +55,7 @@ export default function Navbar() {
   return (
     <header
       ref={navRef}
-      className="relative w-full flex flex-col md:flex-row items-center justify-between px-6 md:px-8 py-4 bg-white"
+      className="relative w-full flex flex-row items-center justify-between px-0 py-0 md:px-8 md:py-4 bg-white"
     >
 
 
