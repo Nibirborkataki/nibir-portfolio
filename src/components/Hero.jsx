@@ -148,7 +148,7 @@ export default function Hero() {
         <img
           src="/Images.png"
           alt="Main Image"
-          className="relative w-[220px] lg:w-[300px] h-[320px] lg:h-[420px] object-cover z-10 drop-shadow-2xl"
+          className="relative w-[220px] lg:w-[300px] h-full object-cover z-10 drop-shadow-2xl"
         />
       </div>
     </section>
