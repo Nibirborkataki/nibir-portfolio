@@ -92,7 +92,7 @@ export default function Footer() {
                 GitHub
               </a>
               <a
-                href="https://www.instagram.com/nibirborkataki/"
+                href="https://www.instagram.com/__nibir_01/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-gray-400 hover:text-white transition"
