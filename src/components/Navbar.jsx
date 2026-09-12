@@ -93,9 +93,9 @@ export default function Navbar() {
         aria-label="Toggle Navigation Menu"
       >
         {mobileMenuOpen ? (
-          <X size={24} />
+          <X size={28} />
         ) : (
-          <Menu size={24} />
+          <Menu size={28} />
         )}
       </button>
 
