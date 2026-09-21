@@ -11,9 +11,14 @@ export default function ParticleCanvas() {
     let animationFrameId;
     let particles = [];
 
+    let lastWidth = window.innerWidth;
     const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // Ignore height-only changes on mobile (address bar hiding/showing) to prevent lag
+      if (window.innerWidth !== lastWidth || canvas.width === 0) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        lastWidth = window.innerWidth;
+      }
     };
 
     handleResize();
@@ -24,15 +29,15 @@ export default function ParticleCanvas() {
         this.x = x;
         this.y = y;
         this.size = Math.random() * 2.5 + 1;
-        this.speedX = (Math.random() - 0.5) * 1.6;
-        this.speedY = (Math.random() - 0.5) * 1.6;
+        this.speedX = (Math.random() - 0.5) * 1.5;
+        this.speedY = Math.random() * 1.5 + 0.5; // Falling down
         this.alpha = 0.65;
       }
 
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
-        this.alpha -= 0.015;
+        this.alpha -= 0.012; // Slower decay = longer lifespan (more density)
       }
 
       draw() {
@@ -44,7 +49,7 @@ export default function ParticleCanvas() {
     }
 
     const handleMouseMove = (e) => {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 4; i++) { // Increased from 3 to 4 particles
         particles.push(new Particle(e.clientX, e.clientY));
       }
     };

@@ -143,9 +143,9 @@ export default function Testimonials() {
                 />
               </div>
               <div>
-                <p className="text-sm font-bold text-black">Hasin A Ahmed</p>
+                <p className="text-sm font-bold text-black">Dipankar Das</p>
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-1">
-                  Assistand Professor
+                  IT Executive, sns media
                 </p>
               </div>
             </div>
