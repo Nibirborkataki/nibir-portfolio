@@ -46,6 +46,7 @@ export default function Navbar() {
     { label: 'Home', href: '#home' },
     { label: 'Skill', href: '#skills' },
     { label: 'Journey', href: '#journey' },
+    { label: 'Projects', href: '#projects' },
     { label: 'Reviews', href: '#reviews' },
     { label: 'Contact', href: '#contact' },
   ];
