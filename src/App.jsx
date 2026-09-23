@@ -3,6 +3,7 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import LoadingScreen from './components/LoadingScreen';
+import { setLenis } from './utils/lenis';
 import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
 import ParticleCanvas from './components/ParticleCanvas';
@@ -36,6 +37,7 @@ export default function App() {
       infinite: false,
     });
     lenisRef.current = lenis;
+    setLenis(lenis);
 
     // Keep the page pinned to the top while the loading screen is up.
     if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
@@ -56,6 +58,7 @@ export default function App() {
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
       lenisRef.current = null;
+      setLenis(null);
     };
   }, []);
 
