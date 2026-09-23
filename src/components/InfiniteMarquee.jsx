@@ -2,47 +2,135 @@ import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Observer } from 'gsap/Observer';
 import { useGSAP } from '@gsap/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getLenis } from '../utils/lenis';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, Observer);
 
 const MARQUEE_TEXT = 'I Build Modern Web Experiences • I Design Clean Interfaces • I Solve Real Problems';
 const DRAG_SPEED = 1.5;
+const TOUCH_SPEED = 1.6;
+// Crossing faster than this (px/s) – e.g. a nav-link jump or a hard fling – skips the lock.
+const SKIP_VELOCITY = 6000;
 
 export default function InfiniteMarquee() {
   const containerRef = useRef(null);
   const cursorRef = useRef(null);
   const textRef = useRef(null);
-  const triggerRef = useRef(null);
+  const apiRef = useRef(null);
   const dragRef = useRef(null);
 
-  // Pin the section and turn vertical scroll into a horizontal run through the whole sentence.
+  // When the line reaches the middle of the screen the page pauses in place (the sections
+  // above and below stay visible) and scroll input moves the sentence sideways instead.
+  // Once the sentence is complete, scrolling carries on; the same in reverse going up.
   useGSAP(
     () => {
       const text = textRef.current;
-      const distance = () => Math.max(0, text.scrollWidth - window.innerWidth);
+      const html = document.documentElement;
+      const distance = () => Math.max(1, text.scrollWidth - window.innerWidth);
+      const setX = gsap.quickTo(text, 'x', { duration: 0.55, ease: 'power3.out' });
 
-      const tween = gsap.to(text, {
-        x: () => -distance(),
-        ease: 'none',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'center center',
-          end: () => `+=${distance()}`,
-          pin: true,
-          // The app root is a flex column, where GSAP defaults this to false.
-          pinSpacing: true,
-          scrub: 0.6,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
+      // mode: 'before' = sentence at start, page above; 'after' = sentence done, page below.
+      const state = { progress: 0, mode: 'before', locked: false, bypassUntil: 0 };
+      const render = () => setX(-state.progress * distance());
+
+      const scrollTo = (y) => {
+        const lenis = getLenis();
+        if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+        else window.scrollTo(0, y);
+      };
+
+      const observer = Observer.create({
+        target: window,
+        type: 'wheel,touch',
+        wheelSpeed: -1, // make wheel and touch agree: negative deltaY = "scroll down"
+        preventDefault: true,
+        onChangeY: (self) => {
+          if (!state.locked) return;
+          const intent = -self.deltaY * (self.event.type.startsWith('touch') ? TOUCH_SPEED : 1);
+          const next = state.progress + intent / distance();
+          if (next >= 1 && intent > 0) return unlock('after');
+          if (next <= 0 && intent < 0) return unlock('before');
+          state.progress = gsap.utils.clamp(0, 1, next);
+          render();
         },
       });
-      triggerRef.current = tween.scrollTrigger;
+      observer.disable();
 
-      // Headings get re-rendered into per-letter spans after mount; re-measure once fonts settle.
-      document.fonts?.ready.then(() => ScrollTrigger.refresh());
+      const lock = () => {
+        state.locked = true;
+        scrollTo(trigger.start);
+        getLenis()?.stop();
+        html.style.overflow = 'hidden'; // stops native/touch momentum on mobile
+        observer.enable();
+      };
+
+      function unlock(mode) {
+        state.locked = false;
+        state.mode = mode;
+        state.progress = mode === 'after' ? 1 : 0;
+        render();
+        observer.disable();
+        html.style.overflow = '';
+        getLenis()?.start();
+        // Step just past the trigger so it doesn't immediately re-lock.
+        scrollTo(trigger.start + (mode === 'after' ? 2 : -2));
+      }
+
+      const crossing = (self, mode) => {
+        const skip = performance.now() < state.bypassUntil || Math.abs(self.getVelocity()) > SKIP_VELOCITY;
+        if (skip) {
+          state.mode = mode;
+          state.progress = mode === 'after' ? 1 : 0;
+          render();
+          return;
+        }
+        lock();
+      };
+
+      const trigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: 'center center',
+        end: '+=1',
+        onEnter: (self) => state.mode !== 'after' && crossing(self, 'after'),
+        onEnterBack: (self) => state.mode !== 'before' && crossing(self, 'before'),
+        onRefresh: () => {
+          if (!state.locked) gsap.set(text, { x: -state.progress * distance() });
+        },
+      });
+
+      // Landing mid-page (reload / deep link) below the line: show it completed.
+      if (window.scrollY > trigger.start) {
+        state.mode = 'after';
+        state.progress = 1;
+        gsap.set(text, { x: -distance() });
+      }
+
+      // In-page nav links jump straight past the marquee.
+      const onClick = (e) => {
+        if (e.target.closest?.('a[href^="#"]')) state.bypassUntil = performance.now() + 2500;
+      };
+      document.addEventListener('click', onClick, true);
+
+      apiRef.current = {
+        getProgress: () => state.progress,
+        setProgress: (p) => {
+          state.progress = gsap.utils.clamp(0, 1, p);
+          render();
+        },
+        distance,
+      };
+
+      return () => {
+        document.removeEventListener('click', onClick, true);
+        if (state.locked) {
+          html.style.overflow = '';
+          getLenis()?.start();
+        }
+        observer.kill();
+      };
     },
     { scope: containerRef }
   );
@@ -51,21 +139,14 @@ export default function InfiniteMarquee() {
     gsap.set(cursorRef.current, { xPercent: -50, yPercent: -50 });
   }, []);
 
-  // Dragging scrubs the same pinned scroll range, so drag and scroll never disagree.
+  // Dragging moves the sentence directly.
   useEffect(() => {
-    const scrollTo = (y) => {
-      const lenis = getLenis();
-      if (lenis) lenis.scrollTo(y, { immediate: true });
-      else window.scrollTo(0, y);
-    };
-
     const onMove = (e) => {
       const drag = dragRef.current;
       if (!drag) return;
       e.preventDefault();
-      const st = triggerRef.current;
-      const target = drag.startScroll - (e.clientX - drag.startX) * DRAG_SPEED;
-      scrollTo(gsap.utils.clamp(st.start, st.end, target));
+      const api = apiRef.current;
+      api.setProgress(drag.startProgress - ((e.clientX - drag.startX) * DRAG_SPEED) / api.distance());
     };
 
     const onUp = () => {
@@ -83,11 +164,9 @@ export default function InfiniteMarquee() {
   }, []);
 
   const handleMouseDown = (e) => {
-    const st = triggerRef.current;
-    // Only drag while the line is pinned; elsewhere a drag would yank the page.
-    if (e.button !== 0 || !st?.isActive) return;
+    if (e.button !== 0 || !apiRef.current) return;
     e.preventDefault();
-    dragRef.current = { startX: e.clientX, startScroll: st.scroll() };
+    dragRef.current = { startX: e.clientX, startProgress: apiRef.current.getProgress() };
     gsap.to(cursorRef.current, { scale: 0.85, duration: 0.2 });
   };
 
@@ -117,7 +196,7 @@ export default function InfiniteMarquee() {
       onMouseMove={handleMouseMove}
       onMouseDown={handleMouseDown}
     >
-      {/* Custom drag cursor for desktop – portalled so the pinned section can't offset it */}
+      {/* Custom drag cursor for desktop */}
       {createPortal(
         <div
           ref={cursorRef}

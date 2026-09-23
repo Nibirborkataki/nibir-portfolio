@@ -6,7 +6,9 @@ const EVENT = 'app:ready';
 export function markAppReady() {
   if (ready) return;
   ready = true;
-  window.dispatchEvent(new Event(EVENT));
+  // Dispatch on a fresh task: this is usually called from a GSAP callback, and anything
+  // listeners create there would be adopted by (and reverted with) the caller's gsap.context.
+  setTimeout(() => window.dispatchEvent(new Event(EVENT)), 0);
 }
 
 export function onAppReady(callback) {

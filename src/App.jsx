@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
+import 'lenis/dist/lenis.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import LoadingScreen from './components/LoadingScreen';
@@ -25,16 +26,17 @@ export default function App() {
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     
+    // Mobile address-bar show/hide shouldn't re-measure every trigger mid-scroll.
+    ScrollTrigger.config({ ignoreMobileResize: true });
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 1,
-      smoothTouch: false,
-      touchMultiplier: 2,
-      infinite: false,
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
+      // Let Lenis handle "#section" links so they glide instead of fighting CSS smooth scroll.
+      anchors: { offset: -20 },
     });
     lenisRef.current = lenis;
     setLenis(lenis);

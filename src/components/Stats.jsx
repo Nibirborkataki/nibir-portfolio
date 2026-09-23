@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { onAppReady } from "../utils/appReady";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -11,47 +12,43 @@ function StatItem({ target, label }) {
 
   useGSAP(
     () => {
-      const el = elementRef.current;
       const counter = counterRef.current;
-
       const counterObj = { value: 0 };
+      const render = () => {
+        counter.textContent = `${Math.floor(counterObj.value)}+`;
+      };
 
-      gsap.to(counterObj, {
-        value: target,
-        duration: 1.4,
-        ease: "power2.out",
+      // Count up every time the stats come into view (from either direction)...
+      const play = () => {
+        counterObj.value = 0;
+        render();
+        gsap.to(counterObj, { value: target, duration: 1.4, ease: "power2.out", overwrite: true, onUpdate: render });
+      };
+      // ...and quietly reset once they're off screen, ready for the next visit.
+      const reset = () => {
+        gsap.killTweensOf(counterObj);
+        counterObj.value = 0;
+        render();
+      };
 
-        scrollTrigger: {
-          trigger: el,
-          start: "top 70%",
-          toggleActions: "play none none reverse",
-
-          onEnter: () => {
-            gsap.to(counterObj, {
-              value: target,
-              duration: 1.4,
-              ease: "power2.out",
-              overwrite: true,
-              onUpdate: () => {
-                counter.textContent = `${Math.floor(counterObj.value)}+`;
-              },
-            });
-          },
-
-          onLeaveBack: () => {
-            gsap.killTweensOf(counterObj);
-
-            gsap.to(counterObj, {
-              value: 0,
-              duration: 0.3,
-              ease: "power2.out",
-              onUpdate: () => {
-                counter.textContent = `${Math.floor(counterObj.value)}+`;
-              },
-            });
-          },
-        },
+      let trigger;
+      // Wait for the loading screen so the first count isn't spent behind it.
+      const stopWaiting = onAppReady(() => {
+        trigger = ScrollTrigger.create({
+          trigger: elementRef.current,
+          start: "top 85%",
+          end: "bottom 15%",
+          onEnter: play,
+          onEnterBack: play,
+          onLeave: reset,
+          onLeaveBack: reset,
+        });
       });
+
+      return () => {
+        stopWaiting();
+        trigger?.kill();
+      };
     },
     {
       scope: elementRef,

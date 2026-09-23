@@ -3,23 +3,43 @@ import gsap from 'gsap';
 
 export default function CustomCursor() {
   const cursorRef = useRef(null);
+  const ballRef = useRef(null);
 
   useEffect(() => {
     const cursor = cursorRef.current;
-    if (!cursor) return;
+    const ball = ballRef.current;
+    if (!cursor || !ball) return;
     
     gsap.set(cursor, { xPercent: -50, yPercent: -50 });
+    const xTo = gsap.quickTo(cursor, 'x', { duration: 0.15, ease: 'power2.out' });
+    const yTo = gsap.quickTo(cursor, 'y', { duration: 0.15, ease: 'power2.out' });
+
+    // Squash & stretch: the ball elongates along its direction of travel and
+    // springs back to round as it slows down.
+    let prevX = 0;
+    let prevY = 0;
+    let stretch = 0;
+    let angle = 0;
+    const deform = () => {
+      const x = gsap.getProperty(cursor, 'x');
+      const y = gsap.getProperty(cursor, 'y');
+      const dx = x - prevX;
+      const dy = y - prevY;
+      prevX = x;
+      prevY = y;
+      const speed = Math.hypot(dx, dy);
+      if (speed > 0.6) angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+      stretch += (Math.min(speed / 45, 0.42) - stretch) * 0.22;
+      gsap.set(ball, { rotation: angle, scaleX: 1 + stretch, scaleY: 1 - stretch * 0.55 });
+    };
+    gsap.ticker.add(deform);
 
     const handleMouseMove = (e) => {
       // Only run on desktop
       if (window.innerWidth < 768) return;
 
-      gsap.to(cursor, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 0.15,
-        ease: 'power2.out',
-      });
+      xTo(e.clientX);
+      yTo(e.clientY);
 
       const chars = document.querySelectorAll('.fisheye-char');
       let isHoveringInteractive = false;
@@ -122,14 +142,18 @@ export default function CustomCursor() {
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
+      gsap.ticker.remove(deform);
     };
   }, []);
 
   return (
+    // Outer element follows the mouse and handles hover scaling; the inner ball deforms.
     <div 
       ref={cursorRef}
-      className="hidden md:block fixed top-0 left-0 w-8 h-8 bg-white mix-blend-difference rounded-full pointer-events-none z-[9999]"
+      className="hidden md:block fixed top-0 left-0 w-8 h-8 mix-blend-difference pointer-events-none z-[9999]"
       style={{ willChange: 'transform' }}
-    ></div>
+    >
+      <div ref={ballRef} className="w-full h-full bg-white rounded-full" style={{ willChange: 'transform' }} />
+    </div>
   );
 }

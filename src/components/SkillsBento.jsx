@@ -199,28 +199,31 @@ export default function SkillsBento() {
           </div>
         </div>
 
-        {/* Card 4: Hardware & Networking */}
+        {/* Card 4: Agentic AI */}
         <div className="bento-card md:col-span-4 bg-white border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
           <div>
             <div className="flex justify-between items-start mb-8 md:mb-12">
               <span className="material-symbols-outlined text-4xl text-black">
-                router
+                smart_toy
               </span>
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
                 Level: Intermediate
               </span>
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-black">Networking</h3>
+            <h3 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-black">Agentic AI</h3>
             <p className="text-sm text-gray-500 leading-relaxed">
-              Optimizing physical infrastructure and establishing secure network architectures.
+              Building LLM-powered agents that plan tasks, call tools and APIs, and automate multi-step workflows.
             </p>
           </div>
           <div className="mt-10 md:mt-16 flex flex-wrap gap-2">
             <span className="rounded-full bg-gray-100 py-1.5 px-4 text-[10px] font-bold uppercase tracking-widest text-gray-600">
-              SysAdmin
+              LLM APIs
             </span>
             <span className="rounded-full bg-gray-100 py-1.5 px-4 text-[10px] font-bold uppercase tracking-widest text-gray-600">
-              Maintenance
+              Tool Calling
+            </span>
+            <span className="rounded-full bg-gray-100 py-1.5 px-4 text-[10px] font-bold uppercase tracking-widest text-gray-600">
+              Automation
             </span>
           </div>
         </div>
