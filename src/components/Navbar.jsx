@@ -59,8 +59,8 @@ export default function Navbar() {
     >
 
 
-      {/* Logo */}
-      <div className="nav-logo bg-gray-900 px-6 h-10 flex items-center justify-center text-white md:mr-5 rounded-sm">
+      {/* Logo - kept out of the cursor's fisheye effect so the letters stay inside the box */}
+      <div data-no-fisheye className="nav-logo bg-gray-900 px-6 h-10 flex items-center justify-center text-white md:mr-5 rounded-sm">
         <h1 className="text-xl font-bold tracking-wider">
           N. Borkataki
         </h1>

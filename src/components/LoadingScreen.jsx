@@ -32,6 +32,10 @@ const FINGERS = [
   { id: 'b', cx: 836, cy: 799, rx: 17, ry: 25, tipX: 840, tipY: 814 },
 ];
 
+// Regions the filter can push vertically. The hand mask fades out towards the wrist,
+// so the hand pivots there; fingers are listed after it so they layer on top.
+const MOVERS = [{ id: 'hand', cx: 775, cy: 778, rx: 118, ry: 62 }, ...FINGERS];
+
 // Visible keys around the fingertips, grouped by the finger that presses them.
 const KEYS = [
   { x: 786, y: 838, finger: 'a' },
@@ -46,12 +50,6 @@ const STEAM = [
   'M438 728 C 424 700, 458 676, 440 646 S 424 598, 446 566',
   'M458 730 C 474 702, 444 680, 462 650 S 478 606, 458 574',
   'M448 726 C 440 704, 462 690, 450 664 S 440 628, 452 604',
-];
-
-const WIND = [
-  'M560 70 C 640 40, 720 60, 800 30 S 940 20, 1040 50',
-  'M600 150 C 690 120, 760 140, 850 110 S 980 110, 1070 140',
-  'M640 20 C 720 0, 800 18, 880 -4 S 990 -10, 1060 12',
 ];
 
 const STATUS = [
@@ -80,7 +78,7 @@ const HAIR_MASK = svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${FX.w}
 </g>
 </svg>`);
 
-const fingerMask = ({ cx, cy, rx, ry }) =>
+const moverMask = ({ cx, cy, rx, ry }) =>
   svgUri(`<svg xmlns="http://www.w3.org/2000/svg" width="${FX.w}" height="${FX.h}" viewBox="${FX.x} ${FX.y} ${FX.w} ${FX.h}">
 <defs><radialGradient id="g"><stop offset="0.4" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
 <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#g)"/>
@@ -157,7 +155,7 @@ export default function LoadingScreen({ onFinish }) {
   onFinishRef.current = onFinish;
 
   const dust = useMemo(() => makeDust(26), []);
-  const fingerMasks = useMemo(() => FINGERS.map(fingerMask), []);
+  const moverMasks = useMemo(() => MOVERS.map(moverMask), []);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -204,12 +202,16 @@ export default function LoadingScreen({ onFinish }) {
       });
     };
 
-    const fingerPush = { a: 0, b: 0 };
-    const floods = Object.fromEntries(FINGERS.map((f) => [f.id, svg.querySelector(`#np-finger-flood-${f.id}`)]));
-    const writeFinger = (id) => {
-      // Negative Y displacement samples from above => the fingertip moves down onto the key.
-      const g = Math.round(NEUTRAL - (fingerPush[id] * 255) / DISPLACE_SCALE);
-      floods[id].setAttribute('flood-color', `rgb(${NEUTRAL},${g},${NEUTRAL})`);
+    // Vertical push in image pixels (positive = down). Fingers ride on top of the hand.
+    const push = { hand: 0, a: 0, b: 0 };
+    const floods = Object.fromEntries(MOVERS.map((m) => [m.id, svg.querySelector(`#np-move-flood-${m.id}`)]));
+    const writePush = () => {
+      MOVERS.forEach(({ id }) => {
+        const dy = id === 'hand' ? push.hand : push.hand + push[id];
+        // Negative Y displacement samples from above => the region moves down.
+        const g = Math.round(NEUTRAL - (dy * 255) / DISPLACE_SCALE);
+        floods[id].setAttribute('flood-color', `rgb(${NEUTRAL},${g},${NEUTRAL})`);
+      });
     };
 
     const tap = (fingerId) => {
@@ -217,57 +219,48 @@ export default function LoadingScreen({ onFinish }) {
       const key = keys[Math.floor(Math.random() * keys.length)];
       const cues = q(`.np-cue-${fingerId} path`);
       ctx.add(() => {
-        gsap.timeline()
-          .to(fingerPush, { [fingerId]: 2.6, duration: 0.06, ease: 'power2.in', onUpdate: () => writeFinger(fingerId) })
-          .to(fingerPush, { [fingerId]: 0, duration: 0.14, ease: 'power2.out', onUpdate: () => writeFinger(fingerId) });
-        gsap.fromTo(key, { opacity: 0.95 }, { opacity: 0, duration: 0.45, ease: 'power2.out', delay: 0.05 });
+        // Small lift, quick strike, a beat on the key, then release.
+        gsap.timeline({ onUpdate: writePush })
+          .to(push, { [fingerId]: -1.2, duration: 0.07, ease: 'sine.out' })
+          .to(push, { [fingerId]: 4, duration: 0.07, ease: 'power3.in' })
+          .to(push, { [fingerId]: 0, duration: 0.2, ease: 'power2.out' }, '+=0.04');
+        gsap.fromTo(key, { opacity: 0.95 }, { opacity: 0, duration: 0.45, ease: 'power2.out', delay: 0.14 });
         gsap.fromTo(
           cues,
           { opacity: 0.85, scale: 0.6, transformOrigin: '50% 100%' },
-          { opacity: 0, scale: 1.25, duration: 0.32, ease: 'power1.out', stagger: 0.02, delay: 0.03 }
+          { opacity: 0, scale: 1.25, duration: 0.32, ease: 'power1.out', stagger: 0.02, delay: 0.13 }
         );
       });
     };
 
     const typeLoop = () => {
-      // Short bursts with pauses feel like real typing.
-      const burst = 3 + Math.floor(Math.random() * 6);
-      let t = 0;
-      for (let i = 0; i < burst; i++) {
-        const finger = Math.random() < 0.62 ? 'a' : 'b';
-        ctx.add(() => gsap.delayedCall(t, () => tap(finger)));
-        t += 0.11 + Math.random() * 0.14;
-      }
-      ctx.add(() => gsap.delayedCall(t + 0.35 + Math.random() * 0.7, typeLoop));
+      // A "one-two" (sometimes a third) keystroke, the hand dipping with it, then a thinking pause.
+      const strokes = Math.random() < 0.3 ? ['a', 'b', 'a'] : Math.random() < 0.5 ? ['a', 'b'] : ['b', 'a'];
+      const gap = 0.24;
+      ctx.add(() => {
+        gsap.timeline({ onUpdate: writePush })
+          .to(push, { hand: -1.4, duration: 0.22, ease: 'sine.out' })
+          .to(push, { hand: 1, duration: 0.16, ease: 'power2.in' })
+          .to(push, { hand: 0, duration: 0.45, ease: 'sine.inOut' }, `+=${strokes.length * gap}`);
+        strokes.forEach((finger, i) => gsap.delayedCall(0.3 + i * gap, () => tap(finger)));
+        gsap.delayedCall(0.3 + strokes.length * gap + 0.9 + Math.random() * 0.9, typeLoop);
+      });
     };
 
     if (!reduceMotion) {
       ctx.add(() => {
-        // Hair: slide the noise field through the hair mask like wind, with gusts.
+        // Hair: drift the noise field slowly through the hair mask - a light room breeze.
         const offset = svg.querySelector('#np-hair-offset');
         const hairAlpha = svg.querySelector('#np-hair-alpha');
-        const wind = { dx: 0, dy: 0, gust: 0.65 };
+        const wind = { dx: 0, dy: 0, gust: 0.28 };
         const applyWind = () => {
           offset.setAttribute('dx', wind.dx.toFixed(2));
           offset.setAttribute('dy', wind.dy.toFixed(2));
           hairAlpha.setAttribute('slope', wind.gust.toFixed(3));
         };
-        gsap.to(wind, { dx: 180, duration: 5.2, ease: 'sine.inOut', yoyo: true, repeat: -1, onUpdate: applyWind });
-        gsap.to(wind, { dy: 26, duration: 3.1, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-        gsap.to(wind, { gust: 1, duration: 1.7, ease: 'sine.inOut', yoyo: true, repeat: -1, repeatDelay: 0.4 });
-
-        q('.np-wind path').forEach((path, i) => {
-          const len = path.getTotalLength();
-          gsap.set(path, { strokeDasharray: `${len * 0.28} ${len}`, strokeDashoffset: len * 0.28 });
-          gsap.to(path, {
-            strokeDashoffset: -len,
-            duration: 2.6 + i * 0.5,
-            ease: 'power1.inOut',
-            repeat: -1,
-            delay: i * 0.9,
-            repeatDelay: 0.8 + i * 0.3,
-          });
-        });
+        gsap.to(wind, { dx: 70, duration: 7, ease: 'sine.inOut', yoyo: true, repeat: -1, onUpdate: applyWind });
+        gsap.to(wind, { dy: 10, duration: 4.6, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+        gsap.to(wind, { gust: 0.48, duration: 2.8, ease: 'sine.inOut', yoyo: true, repeat: -1, repeatDelay: 1.2 });
 
         // Body: barely-there breathing, anchored at the desk so the desk stays put.
         gsap.to(stageRef.current, {
@@ -469,26 +462,26 @@ export default function LoadingScreen({ onFinish }) {
                   <feComponentTransfer in="hairNoise" result="hairMap">
                     <feFuncA id="np-hair-alpha" type="linear" slope="0.55" />
                   </feComponentTransfer>
-                  {FINGERS.map((f, i) => (
-                    <React.Fragment key={f.id}>
+                  {MOVERS.map((m, i) => (
+                    <React.Fragment key={m.id}>
                       <feImage
-                        href={fingerMasks[i]}
+                        href={moverMasks[i]}
                         x={FX.x}
                         y={FX.y}
                         width={FX.w}
                         height={FX.h}
                         preserveAspectRatio="none"
-                        result={`fingerMask-${f.id}`}
+                        result={`moveMask-${m.id}`}
                       />
-                      <feFlood id={`np-finger-flood-${f.id}`} floodColor={`rgb(${NEUTRAL},${NEUTRAL},${NEUTRAL})`} result={`fingerColor-${f.id}`} />
-                      <feComposite in={`fingerColor-${f.id}`} in2={`fingerMask-${f.id}`} operator="in" result={`finger-${f.id}`} />
+                      <feFlood id={`np-move-flood-${m.id}`} floodColor={`rgb(${NEUTRAL},${NEUTRAL},${NEUTRAL})`} result={`moveColor-${m.id}`} />
+                      <feComposite in={`moveColor-${m.id}`} in2={`moveMask-${m.id}`} operator="in" result={`move-${m.id}`} />
                     </React.Fragment>
                   ))}
                   <feMerge result="map">
                     <feMergeNode in="neutral" />
                     <feMergeNode in="hairMap" />
-                    {FINGERS.map((f) => (
-                      <feMergeNode key={f.id} in={`finger-${f.id}`} />
+                    {MOVERS.map((m) => (
+                      <feMergeNode key={m.id} in={`move-${m.id}`} />
                     ))}
                   </feMerge>
                   <feDisplacementMap in="SourceGraphic" in2="map" scale={DISPLACE_SCALE} xChannelSelector="R" yChannelSelector="G" />
@@ -567,13 +560,6 @@ export default function LoadingScreen({ onFinish }) {
                   <path d={`M ${f.tipX + 9} ${f.tipY - 13} l 5 -8`} opacity="0" />
                 </g>
               ))}
-
-              {/* Breeze streaks around the hair */}
-              <g className="np-wind" stroke="#f1ece4" strokeWidth="1.6" strokeLinecap="round" fill="none" opacity="0.38">
-                {WIND.map((d, i) => (
-                  <path key={i} d={d} />
-                ))}
-              </g>
 
               {/* Steam from the mug */}
               <g className="np-steam" stroke="#e9e4dc" strokeWidth="5" strokeLinecap="round" fill="none" filter="url(#np-blur-sm)">

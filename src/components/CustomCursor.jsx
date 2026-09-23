@@ -77,7 +77,7 @@ export default function CustomCursor() {
     const processHeaders = () => {
       const headers = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
       headers.forEach(header => {
-        if (header.classList.contains('fisheye-processed')) return;
+        if (header.classList.contains('fisheye-processed') || header.closest('[data-no-fisheye]')) return;
         header.classList.add('fisheye-processed');
         
         const walk = document.createTreeWalker(header, NodeFilter.SHOW_TEXT, null, false);
