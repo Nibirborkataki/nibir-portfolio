@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import { onAppReady } from '../utils/appReady';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -29,7 +30,9 @@ export default function Hero() {
   useGSAP(
     () => {
       // Entrance Timeline on page load
+      // Paused until the loading screen reveals the page.
       const tl = gsap.timeline({
+        paused: true,
         defaults: { ease: 'power3.out' },
         onComplete: () => {
           gsap.set(['.hero-badge', '.hero-heading', '.hero-desc', '.hero-btn', imageContainerRef.current], {
@@ -93,6 +96,8 @@ export default function Hero() {
         y: 30,
         ease: 'none',
       });
+
+      return onAppReady(() => tl.play());
     },
     { scope: containerRef }
   );

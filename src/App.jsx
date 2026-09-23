@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import LoadingScreen from './components/LoadingScreen';
 import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
 import ParticleCanvas from './components/ParticleCanvas';
@@ -17,6 +18,9 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+  const lenisRef = useRef(null);
+
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     
@@ -31,6 +35,13 @@ export default function App() {
       touchMultiplier: 2,
       infinite: false,
     });
+    lenisRef.current = lenis;
+
+    // Keep the page pinned to the top while the loading screen is up.
+    if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    document.documentElement.style.overflow = 'hidden';
+    lenis.stop();
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -44,11 +55,20 @@ export default function App() {
     return () => {
       gsap.ticker.remove(updateLenis);
       lenis.destroy();
+      lenisRef.current = null;
     };
+  }, []);
+
+  const handleLoaded = useCallback(() => {
+    setLoading(false);
+    document.documentElement.style.overflow = '';
+    lenisRef.current?.start();
+    ScrollTrigger.refresh();
   }, []);
 
   return (
     <div className="bg-white text-gray-900 flex flex-col min-h-screen">
+      {loading && <LoadingScreen onFinish={handleLoaded} />}
       <CustomCursor />
       {/* Particle Canvas on hover/mouse move */}
       <ParticleCanvas />
