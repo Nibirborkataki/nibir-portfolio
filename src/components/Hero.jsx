@@ -3,6 +3,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import { onAppReady } from '../utils/appReady';
+import ColorLensImage from './ColorLensImage';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -149,11 +150,12 @@ export default function Hero() {
           <p className="text-white font-bold text-sm tracking-widest uppercase">Maac</p>
         </div>
 
-        {/* Main Image */}
-        <img
+        {/* Main Image – colour water-drop lens on hover */}
+        <ColorLensImage
           src="/Images.png"
           alt="Main Image"
-          className="relative w-[220px] lg:w-[300px] h-full object-cover z-10 drop-shadow-2xl"
+          className="w-[220px] lg:w-[300px] h-full z-10"
+          imgClassName="drop-shadow-2xl"
         />
       </div>
     </section>

@@ -80,7 +80,10 @@ export default function CustomCursor() {
         }
       });
 
-      if (isHoveringInteractive) {
+      if (e.target.closest?.('[data-cursor="lens"]')) {
+        // An element with its own lens effect takes over from the ball.
+        gsap.to(cursor, { scale: 0, duration: 0.25, ease: 'power2.out', overwrite: 'auto' });
+      } else if (isHoveringInteractive) {
         gsap.to(cursor, { scale: 2, duration: 0.3, ease: 'back.out(1.5)', overwrite: 'auto' });
       } else {
         const target = e.target;

@@ -11,7 +11,12 @@ gsap.registerPlugin(ScrollTrigger, Observer);
 
 const MARQUEE_TEXT = 'I Build Modern Web Experiences • I Design Clean Interfaces • I Solve Real Problems';
 const DRAG_SPEED = 1.5;
-const TOUCH_SPEED = 1.6;
+const WHEEL_SPEED = 1.5;
+const TOUCH_SPEED = 2.4;
+// Momentum: after input stops the sentence keeps gliding, losing (1 - FRICTION) of its speed per frame.
+const FRICTION = 0.9;
+const WHEEL_GLIDE = 0.08; // share of each wheel step carried into the glide
+const MAX_GLIDE = 0.03; // cap, in progress per frame
 // Crossing faster than this (px/s) – e.g. a nav-link jump or a hard fling – skips the lock.
 const SKIP_VELOCITY = 6000;
 
@@ -30,11 +35,31 @@ export default function InfiniteMarquee() {
       const text = textRef.current;
       const html = document.documentElement;
       const distance = () => Math.max(1, text.scrollWidth - window.innerWidth);
-      const setX = gsap.quickTo(text, 'x', { duration: 0.55, ease: 'power3.out' });
+      const setX = gsap.quickTo(text, 'x', { duration: 0.5, ease: 'power3.out' });
 
       // mode: 'before' = sentence at start, page above; 'after' = sentence done, page below.
-      const state = { progress: 0, mode: 'before', locked: false, bypassUntil: 0 };
+      // velocity is in progress-per-frame and drives the glide after input stops.
+      const state = {
+        progress: 0,
+        mode: 'before',
+        locked: false,
+        bypassUntil: 0,
+        velocity: 0,
+        lastInput: 0,
+        touching: false,
+      };
       const render = () => setX(-state.progress * distance());
+      const clampGlide = gsap.utils.clamp(-MAX_GLIDE, MAX_GLIDE);
+
+      const glide = () => {
+        if (state.touching || Math.abs(state.velocity) < 0.00002) return;
+        if (performance.now() - state.lastInput < 60) return; // still receiving input
+        const ratio = gsap.ticker.deltaRatio(60);
+        state.progress = gsap.utils.clamp(0, 1, state.progress + state.velocity * ratio);
+        state.velocity = state.progress === 0 || state.progress === 1 ? 0 : state.velocity * Math.pow(FRICTION, ratio);
+        render();
+      };
+      gsap.ticker.add(glide);
 
       const scrollTo = (y) => {
         const lenis = getLenis();
@@ -47,13 +72,27 @@ export default function InfiniteMarquee() {
         type: 'wheel,touch',
         wheelSpeed: -1, // make wheel and touch agree: negative deltaY = "scroll down"
         preventDefault: true,
+        onPress: () => {
+          state.touching = true;
+          state.velocity = 0;
+        },
+        onRelease: (self) => {
+          state.touching = false;
+          if (!state.locked) return;
+          // Carry the flick's speed into the glide (velocityY is px/s of the finger).
+          state.velocity = clampGlide((-self.velocityY * TOUCH_SPEED) / distance() / 60 * 0.55);
+        },
         onChangeY: (self) => {
           if (!state.locked) return;
-          const intent = -self.deltaY * (self.event.type.startsWith('touch') ? TOUCH_SPEED : 1);
-          const next = state.progress + intent / distance();
-          if (next >= 1 && intent > 0) return unlock('after');
-          if (next <= 0 && intent < 0) return unlock('before');
-          state.progress = gsap.utils.clamp(0, 1, next);
+          const isTouch = self.event.type.startsWith('touch');
+          const intent = -self.deltaY * (isTouch ? TOUCH_SPEED : WHEEL_SPEED);
+          // At either end, one more push in that direction releases the page.
+          if (state.progress >= 1 && intent > 0) return unlock('after');
+          if (state.progress <= 0 && intent < 0) return unlock('before');
+          const delta = intent / distance();
+          state.progress = gsap.utils.clamp(0, 1, state.progress + delta);
+          state.lastInput = performance.now();
+          if (!isTouch) state.velocity = clampGlide(delta * WHEEL_GLIDE);
           render();
         },
       });
@@ -69,6 +108,7 @@ export default function InfiniteMarquee() {
 
       function unlock(mode) {
         state.locked = false;
+        state.velocity = 0;
         state.mode = mode;
         state.progress = mode === 'after' ? 1 : 0;
         render();
@@ -118,12 +158,18 @@ export default function InfiniteMarquee() {
         getProgress: () => state.progress,
         setProgress: (p) => {
           state.progress = gsap.utils.clamp(0, 1, p);
+          state.velocity = 0;
+          state.lastInput = performance.now();
           render();
+        },
+        fling: (v) => {
+          state.velocity = clampGlide(v);
         },
         distance,
       };
 
       return () => {
+        gsap.ticker.remove(glide);
         document.removeEventListener('click', onClick, true);
         if (state.locked) {
           html.style.overflow = '';
@@ -146,11 +192,21 @@ export default function InfiniteMarquee() {
       if (!drag) return;
       e.preventDefault();
       const api = apiRef.current;
-      api.setProgress(drag.startProgress - ((e.clientX - drag.startX) * DRAG_SPEED) / api.distance());
+      const progress = drag.startProgress - ((e.clientX - drag.startX) * DRAG_SPEED) / api.distance();
+      const now = performance.now();
+      const dt = Math.max(now - drag.lastTime, 1);
+      // Track drag speed (progress per 60fps frame) for the release glide.
+      drag.velocity = drag.velocity * 0.6 + ((progress - drag.lastProgress) / dt) * 16.7 * 0.4;
+      drag.lastProgress = progress;
+      drag.lastTime = now;
+      api.setProgress(progress);
     };
 
     const onUp = () => {
-      if (!dragRef.current) return;
+      const drag = dragRef.current;
+      if (!drag) return;
+      // Only fling if the pointer was still moving when released.
+      if (performance.now() - drag.lastTime < 80) apiRef.current?.fling(drag.velocity * 0.8);
       dragRef.current = null;
       gsap.to(cursorRef.current, { scale: 1, duration: 0.2 });
     };
@@ -166,7 +222,14 @@ export default function InfiniteMarquee() {
   const handleMouseDown = (e) => {
     if (e.button !== 0 || !apiRef.current) return;
     e.preventDefault();
-    dragRef.current = { startX: e.clientX, startProgress: apiRef.current.getProgress() };
+    const startProgress = apiRef.current.getProgress();
+    dragRef.current = {
+      startX: e.clientX,
+      startProgress,
+      lastProgress: startProgress,
+      lastTime: performance.now(),
+      velocity: 0,
+    };
     gsap.to(cursorRef.current, { scale: 0.85, duration: 0.2 });
   };
 

@@ -166,7 +166,7 @@ export default function Projects() {
 
   return (
     <section id="projects" ref={sectionRef} className="pt-24 md:pt-32 max-w-7xl mx-auto px-6 md:px-12 w-full">
-      <header className="projects-header mb-12 md:mb-20 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+      <header className="projects-header mb-12 md:mb-20">
         <div className="flex flex-col gap-4">
           <span className="text-[0.6875rem] uppercase tracking-[0.15em] font-semibold text-gray-500">
             Work / 04
@@ -174,10 +174,10 @@ export default function Projects() {
           <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-black leading-[1.1]">
             Selected<br />Projects.
           </h2>
+          <p className="text-base md:text-lg text-gray-600 max-w-xl mt-4 leading-relaxed">
+            Personal experiments, freelance builds and production work, from local AI to fintech pipelines.
+          </p>
         </div>
-        <p className="text-sm md:text-base text-gray-600 max-w-sm leading-relaxed md:text-right">
-          Personal experiments, freelance builds and production work, from local AI to fintech pipelines.
-        </p>
       </header>
 
       <div className="flex flex-col gap-6 md:gap-8">
