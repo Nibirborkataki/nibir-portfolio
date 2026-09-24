@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
+import GuitarString from './GuitarString';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,7 +65,10 @@ export default function About() {
     <section ref={sectionRef} className="max-w-7xl mx-auto px-6 py-12 bg-white mt-10">
       <h2 className="about-title text-3xl font-bold text-start text-gray-800 mb-6">About Me</h2>
       <div className="flex flex-col md:flex-row items-start gap-4">
-        <div className="about-bar h-1 bg-gray-300 w-[160px] mt-3 shrink-0 hidden md:block"></div>
+        {/* Hover it: it plucks like a guitar string */}
+        <div className="about-bar shrink-0 hidden md:block -mt-2.5">
+          <GuitarString />
+        </div>
         <p ref={textRef} className="about-text text-gray-700 text-lg leading-relaxed flex-1">
           {splitText("Hello! I'm a passionate developer and designer who has recently completed a Master's in Information Technology. Over the past 3 years, I've been honing my skills in")}
           <strong>

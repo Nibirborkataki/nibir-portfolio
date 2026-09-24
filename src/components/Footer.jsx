@@ -10,24 +10,39 @@ export default function Footer() {
 
   useGSAP(
     () => {
-      gsap.from('.footer-content', {
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: 'top 95%',
-          toggleActions: 'play none none reverse',
-        },
-        y: 35,
-        opacity: 0,
-        duration: 0.7,
-        ease: 'power3.out',
-      });
+      // The content is pushed up from below as the footer scrolls in (tied to scroll)...
+      const settle = () =>
+        gsap
+          .timeline()
+          // ...and gives a small jump when it lands.
+          .to('.footer-bounce', { y: -14, duration: 0.18, ease: 'power2.out' })
+          .to('.footer-bounce', { y: 0, duration: 0.7, ease: 'bounce.out' });
+
+      gsap.fromTo(
+        '.footer-content',
+        { y: 140, opacity: 0.2 },
+        {
+          y: 0,
+          opacity: 1,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: footerRef.current,
+            start: 'top bottom',
+            // Land a little before the very bottom so the bounce is visible.
+            end: 'bottom bottom+=30',
+            scrub: 0.6,
+            onLeave: settle,
+          },
+        }
+      );
     },
     { scope: footerRef }
   );
 
   return (
-    <footer ref={footerRef} className="bg-black w-full mt-auto px-6 lg:px-20">
-      <div className="footer-content w-full max-w-[1920px] mx-auto px-6 md:px-12 py-12">
+    <footer ref={footerRef} className="bg-black w-full mt-auto px-6 lg:px-20 overflow-hidden">
+      <div className="footer-content">
+      <div className="footer-bounce w-full max-w-[1920px] mx-auto px-6 md:px-12 py-12">
         {/* Top Border */}
         <div className="border-t border-gray-800 mb-10"></div>
 
@@ -116,6 +131,7 @@ export default function Footer() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </footer>
   );

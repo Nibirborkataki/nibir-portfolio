@@ -30,17 +30,16 @@ export default function SkillsBento() {
         }
       );
 
-      // Bento Cards Staggered Reveal
+      // Bento Cards: a clean wipe up from the bottom edge, one after another
       gsap.fromTo(
         '.bento-card',
-        { y: 35, opacity: 0, scale: 0.98 },
+        { clipPath: 'inset(100% 0% 0% 0%)', y: 24 },
         {
+          clipPath: 'inset(0% 0% 0% 0%)',
           y: 0,
-          opacity: 1,
-          scale: 1,
-          stagger: 0.08,
-          duration: 0.6,
-          ease: 'power3.out',
+          stagger: 0.1,
+          duration: 0.9,
+          ease: 'power4.out',
           scrollTrigger: {
             trigger: '.bento-grid',
             start: 'top 90%',
@@ -116,7 +115,7 @@ export default function SkillsBento() {
       {/* Bento Grid Skills Layout */}
       <div className="bento-grid grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
         {/* Card 1: UI/UX Design */}
-        <div className="bento-card md:col-span-8 bg-white border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
+        <div className="bento-card md:col-span-8 bg-white border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
           <div>
             <div className="flex justify-between items-start mb-8 md:mb-12">
               <span className="material-symbols-outlined text-4xl text-black">
@@ -148,7 +147,7 @@ export default function SkillsBento() {
         </div>
 
         {/* Card 2: Machine Learning */}
-        <div className="bento-card md:col-span-4 bg-black border border-black p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 hover:shadow-2xl rounded-sm">
+        <div className="bento-card md:col-span-4 bg-black border border-black p-8 md:p-10 flex flex-col justify-between group transition-[box-shadow,border-color] duration-300 hover:shadow-2xl rounded-sm">
           <div>
             <div className="flex justify-between items-start mb-8 md:mb-12">
               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
@@ -168,7 +167,7 @@ export default function SkillsBento() {
         </div>
 
         {/* Card 3: Development */}
-        <div className="bento-card md:col-span-4 bg-gray-50 border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
+        <div className="bento-card md:col-span-4 bg-gray-50 border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
           <div>
             <div className="flex justify-between items-start mb-8 md:mb-12">
               <span className="material-symbols-outlined text-4xl text-black">
@@ -200,7 +199,7 @@ export default function SkillsBento() {
         </div>
 
         {/* Card 4: Agentic AI */}
-        <div className="bento-card md:col-span-4 bg-white border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
+        <div className="bento-card md:col-span-4 bg-white border border-gray-200 p-8 md:p-10 flex flex-col justify-between group transition-[box-shadow,border-color] duration-300 hover:shadow-xl hover:border-gray-400 rounded-sm">
           <div>
             <div className="flex justify-between items-start mb-8 md:mb-12">
               <span className="material-symbols-outlined text-4xl text-black">

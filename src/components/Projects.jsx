@@ -14,7 +14,8 @@ const FEATURED = [
     description:
       'Ask anything about your PDFs. Documents are chunked and indexed, and answers come from an Ollama model running entirely on my own machine — nothing leaves the system.',
     tags: ['Ollama', 'RAG Pipeline', 'Python', 'Local LLM'],
-    footer: 'Local AI · Private by design',
+    footer: 'Local AI',
+    link: { href: 'https://github.com/Nibirborkataki/LocalRAG-AI', label: 'View on GitHub' },
     Art: RagArt,
     span: 'lg:col-span-6',
   },
@@ -26,6 +27,7 @@ const FEATURED = [
       'An e-newspaper platform for a cultural organisation, with paid subscriptions through a payment gateway, SMS notifications and JWT-secured reader accounts.',
     tags: ['Payment Gateway', 'SMS API', 'JWT Auth', 'Node.js'],
     footer: 'E-publishing & media',
+    link: { href: 'https://www.sanskritirdapoon.in', label: 'Visit sanskritirdapoon.in' },
     Art: DapoonArt,
     span: 'lg:col-span-6',
   },
@@ -87,7 +89,7 @@ function FeaturedCard({ project, index }) {
   const { title, subtitle, badge, description, tags, footer, link, Art, span } = project;
   return (
     <article
-      className={`project-card group ${span} flex flex-col bg-surface-container-low border border-gray-200 p-4 md:p-5 rounded-sm transition-all duration-300 hover:border-gray-400 hover:shadow-xl`}
+      className={`project-card group ${span} flex flex-col bg-surface-container-low border border-gray-200 p-4 md:p-5 rounded-sm transition-[box-shadow,border-color] duration-300 hover:border-gray-400 hover:shadow-xl`}
     >
       <div className="relative overflow-hidden rounded-sm bg-black aspect-[8/5]">
         <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
@@ -154,8 +156,48 @@ export default function Projects() {
         );
 
       reveal('.projects-header', '.projects-header');
-      gsap.utils.toArray('.project-row').forEach((row) => reveal(row.children, row));
       reveal('.project-index-item', '.project-index', 0.08);
+
+      const cards = gsap.utils.toArray('.project-card');
+      const mm = gsap.matchMedia();
+
+      // Desktop: cards fade up in pairs, row by row.
+      mm.add('(min-width: 1024px)', () => {
+        for (let i = 0; i < cards.length; i += 2) reveal(cards.slice(i, i + 2), cards[i]);
+      });
+
+      // Mobile/tablet: a stacking deck. Each card sticks as it arrives, and the next one
+      // slides up from the bottom and settles on top while the one beneath eases back.
+      mm.add('(max-width: 1023px)', () => {
+        const STACK_GAP = 14;
+        const place = () =>
+          cards.forEach((card, i) => {
+            // Stick high enough that even a tall card is fully visible when it lands.
+            const top = Math.min(84, window.innerHeight - card.offsetHeight - 16) + i * STACK_GAP;
+            gsap.set(card, { position: 'sticky', top });
+          });
+        place();
+
+        cards.slice(0, -1).forEach((card, i) => {
+          const next = cards[i + 1];
+          gsap.to(card, {
+            // Only shrink – cards stay opaque so the stack never shows through itself.
+            scale: 0.92,
+            transformOrigin: 'center top',
+            ease: 'none',
+            scrollTrigger: {
+              trigger: next,
+              start: 'top bottom',
+              end: () => `top ${parseFloat(next.style.top) || 0}px`,
+              scrub: 0.4,
+              invalidateOnRefresh: true,
+            },
+          });
+        });
+
+        ScrollTrigger.addEventListener('refreshInit', place);
+        return () => ScrollTrigger.removeEventListener('refreshInit', place);
+      });
 
       gsap.utils.toArray('.project-card').forEach((card) =>
         ScrollTrigger.create({ trigger: card, start: 'top 75%', end: 'bottom 25%', toggleClass: 'is-inview' })
@@ -180,15 +222,11 @@ export default function Projects() {
         </div>
       </header>
 
-      <div className="flex flex-col gap-6 md:gap-8">
-        <div className="project-row grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          <FeaturedCard project={FEATURED[0]} index={0} />
-          <FeaturedCard project={FEATURED[1]} index={1} />
-        </div>
-        <div className="project-row grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
-          <FeaturedCard project={FEATURED[2]} index={2} />
-          <FeaturedCard project={FEATURED[3]} index={3} />
-        </div>
+      {/* One container for all cards so they can stack (sticky) on mobile */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+        {FEATURED.map((project, i) => (
+          <FeaturedCard key={project.title} project={project} index={i} />
+        ))}
       </div>
 
       {/* More work – compact index without images */}

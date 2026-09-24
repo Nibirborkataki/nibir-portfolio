@@ -53,6 +53,17 @@ export default function Navbar() {
 
   // Global CustomCursor component handles the fisheye effect via the .fisheye-char class
 
+  // Hover: flip the whole word around its X axis – two full turns in one second.
+  const spinWord = (e) => {
+    const word = e.currentTarget.querySelector('.nav-word');
+    if (!word || gsap.isTweening(word)) return;
+    gsap.fromTo(
+      word,
+      { rotationX: 0, transformPerspective: 300 },
+      { rotationX: 720, duration: 1, ease: 'power2.inOut', transformPerspective: 300, clearProps: 'transform' }
+    );
+  };
+
   return (
     <header
       ref={navRef}
@@ -74,13 +85,16 @@ export default function Navbar() {
             <li key={link.label} className="nav-item">
               <a
                 href={link.href}
+                onMouseEnter={spinWord}
                 className="inline-flex text-sm md:text-base uppercase tracking-wide text-gray-700 font-medium py-1"
               >
-                {link.label.split('').map((char, i) => (
-                  <span key={i} className="fisheye-char inline-block origin-bottom pointer-events-none transition-colors duration-200">
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
+                <span className="nav-word inline-flex pointer-events-none">
+                  {link.label.split('').map((char, i) => (
+                    <span key={i} className="fisheye-char inline-block origin-bottom pointer-events-none transition-colors duration-200">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                  ))}
+                </span>
               </a>
             </li>
           ))}
