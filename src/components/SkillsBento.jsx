@@ -32,41 +32,48 @@ export default function SkillsBento() {
 
       const mm = gsap.matchMedia();
 
-      // Mobile: a clean wipe up from each card's bottom edge, one after another.
+      // Mobile: each card tilts up into place as it scrolls into view.
       mm.add('(max-width: 767px)', () => {
-        gsap.fromTo(
-          '.bento-card',
-          { clipPath: 'inset(100% 0% 0% 0%)', y: 24 },
-          {
-            clipPath: 'inset(0% 0% 0% 0%)',
-            y: 0,
-            stagger: 0.1,
-            duration: 0.9,
-            ease: 'power4.out',
-            scrollTrigger: {
-              trigger: '.bento-grid',
-              start: 'top 90%',
-              toggleActions: 'play none none reverse',
-            },
-          }
-        );
+        gsap.utils.toArray('.bento-card').forEach((card) => {
+          gsap.fromTo(
+            card,
+            { y: 70, opacity: 0, rotationX: 12, scale: 0.96, transformPerspective: 900, transformOrigin: '50% 0%' },
+            {
+              y: 0,
+              opacity: 1,
+              rotationX: 0,
+              scale: 1,
+              transformPerspective: 900,
+              duration: 0.9,
+              ease: 'power3.out',
+              scrollTrigger: { trigger: card, start: 'top 92%', toggleActions: 'play none none reverse' },
+            }
+          );
+        });
       });
 
-      // Desktop: the top row pushes in from the right; on the bottom row Agentic AI
-      // appears first and the two cards beside it slide out from behind it.
+      // Desktop: on the top row Machine Learning appears first and UI/UX slides out from
+      // behind it to the left; on the bottom row Agentic AI appears first and the two cards
+      // beside it slide out from behind it.
       mm.add('(min-width: 768px)', () => {
         const [uiCard, mlCard, devCard, agentCard, gfxCard] = gsap.utils.toArray('.bento-card');
 
+        gsap.set(mlCard, { position: 'relative', zIndex: 2 });
+        gsap.set(uiCard, { position: 'relative', zIndex: 1 });
+        // Start with UI/UX's right edge tucked under Machine Learning's right edge.
+        const behindMl = () => mlCard.offsetLeft + mlCard.offsetWidth - (uiCard.offsetLeft + uiCard.offsetWidth);
+
         gsap
           .timeline({
-            defaults: { ease: 'power3.out' },
-            scrollTrigger: { trigger: uiCard, start: 'top 85%', toggleActions: 'play none none reverse' },
+            scrollTrigger: {
+              trigger: uiCard,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+              invalidateOnRefresh: true,
+            },
           })
-          .fromTo(
-            [uiCard, mlCard],
-            { x: 140, opacity: 0 },
-            { x: 0, opacity: 1, duration: 1.1, stagger: 0.14 }
-          );
+          .fromTo(mlCard, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' })
+          .fromTo(uiCard, { x: behindMl, opacity: 0 }, { x: 0, opacity: 1, duration: 1.1, ease: 'power3.inOut' }, '-=0.15');
 
         // Keep the middle card on top while the others slide out from underneath it.
         gsap.set(agentCard, { position: 'relative', zIndex: 2 });

@@ -299,7 +299,7 @@ export default function Contact() {
               <div className="flex flex-col gap-4">
 
                 <a
-                  className="group flex justify-between items-center py-4 border-b border-gray-200 hover:border-black transition-colors"
+                  className="group relative flex justify-between items-center py-4 px-4 border-b border-gray-200 hover:border-black hover:text-white transition-colors duration-300 before:bg-black before:content-[''] before:absolute before:inset-0 before:origin-bottom before:scale-y-0 before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:scale-y-100 [&>*]:relative"
                   href="https://www.linkedin.com/in/nibir-borkataki-a39919254/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -314,7 +314,7 @@ export default function Contact() {
                 </a>
 
                 <a
-                  className="group flex justify-between items-center py-4 border-b border-gray-200 hover:border-black transition-colors"
+                  className="group relative flex justify-between items-center py-4 px-4 border-b border-gray-200 hover:border-black hover:text-white transition-colors duration-300 before:bg-black before:content-[''] before:absolute before:inset-0 before:origin-bottom before:scale-y-0 before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:scale-y-100 [&>*]:relative"
                   href="https://github.com/nibirborkataki"
                   target="_blank"
                   rel="noopener noreferrer"

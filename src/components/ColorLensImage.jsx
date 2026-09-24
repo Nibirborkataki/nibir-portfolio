@@ -10,6 +10,7 @@ const COLOR_GRADE = 'sepia(0.55) saturate(2.4) hue-rotate(-10deg) contrast(1.06)
 /**
  * An image that shows a colour "water drop" lens under the cursor: on hover the lens
  * splashes open with ripples, follows the pointer, and magnifies slightly like water.
+ * Mouse only – touch devices just see the photo.
  */
 export default function ColorLensImage({ src, alt, className = '', imgClassName = '' }) {
   const wrapRef = useRef(null);
@@ -84,16 +85,9 @@ export default function ColorLensImage({ src, alt, className = '', imgClassName 
     const onLeave = (e) => {
       if (e.pointerType === 'mouse') close();
     };
-    let touchTimer;
+    // Mouse only – on touch screens the photo stays as it is.
     const onDown = (e) => {
-      if (e.pointerType === 'mouse') {
-        splash(...local(e), 0.7); // click: a smaller second splash
-        return;
-      }
-      // Touch has no hover: tap to splash, then let it close on its own.
-      splash(...place(e));
-      clearTimeout(touchTimer);
-      touchTimer = setTimeout(close, 1400);
+      if (e.pointerType === 'mouse') splash(...local(e), 0.7); // click: a smaller second splash
     };
 
     wrap.addEventListener('pointerenter', onEnter);
@@ -101,7 +95,6 @@ export default function ColorLensImage({ src, alt, className = '', imgClassName 
     wrap.addEventListener('pointerleave', onLeave);
     wrap.addEventListener('pointerdown', onDown);
     return () => {
-      clearTimeout(touchTimer);
       wrap.removeEventListener('pointerenter', onEnter);
       wrap.removeEventListener('pointermove', onMove);
       wrap.removeEventListener('pointerleave', onLeave);

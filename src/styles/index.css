@@ -11,6 +11,14 @@
   html {
     scrollbar-width: none;
     -ms-overflow-style: none;
+    overscroll-behavior-x: none;
+  }
+
+  /* Touch screens: only vertical panning (pinch-zoom still works) so an accidental
+     sideways drag can't nudge the page and expose its edge. */
+  html,
+  body {
+    touch-action: pan-y pinch-zoom;
   }
 
   body {

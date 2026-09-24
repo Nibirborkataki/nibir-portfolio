@@ -247,7 +247,7 @@ export default function Projects() {
           {MORE.map((item, i) => (
             <li
               key={item.title}
-              className="project-index-item group grid grid-cols-[2.5rem_1fr_auto] md:grid-cols-[3rem_1fr_1fr_auto] items-center gap-x-4 gap-y-1 border-b border-gray-200 py-6 transition-colors duration-300 hover:bg-surface-container-low"
+              className="project-index-item group relative grid grid-cols-[2.5rem_1fr_auto] md:grid-cols-[3rem_1fr_1fr_auto] items-center gap-x-4 gap-y-1 border-b border-gray-200 py-6 before:bg-surface-container-low before:content-[''] before:absolute before:inset-0 before:origin-bottom before:scale-y-0 before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:scale-y-100 [&>*]:relative"
             >
               <span className="text-[10px] font-bold tracking-widest text-gray-400 pl-1">
                 {String(FEATURED.length + i + 1).padStart(2, '0')}
