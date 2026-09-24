@@ -2,10 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Self-hosted variable fonts (SIL Open Font License, see public/fonts):
+   Space Grotesk for headings, Geist for body text. */
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/space-grotesk-variable.woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/fonts/geist-variable-italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --font-heading: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Geist', system-ui, sans-serif;
+}
+
 @layer base {
   /* Hide scrollbar for Chrome, Safari, Edge */
   ::-webkit-scrollbar {
     display: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+
+  /* Space Grotesk has no italic – italic words inside headings use Geist's real italic. */
+  :is(h1, h2, h3, h4, h5, h6) :is(.italic, em, i) {
+    font-family: var(--font-body);
   }
 
   html {
@@ -22,7 +67,7 @@
   }
 
   body {
-    font-family: 'Manrope', sans-serif;
+    font-family: var(--font-body);
     background-color: #ffffff;
     color: #111827;
     overflow-x: hidden;

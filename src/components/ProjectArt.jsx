@@ -5,7 +5,7 @@ const INK = '#f4f4f5';
 const MID = '#a1a1aa';
 const DIM = '#52525b';
 const FAINT = '#27272a';
-const FONT = "Manrope, system-ui, sans-serif";
+const FONT = "'Space Grotesk', system-ui, sans-serif";
 
 function Frame({ id, children }) {
   return (

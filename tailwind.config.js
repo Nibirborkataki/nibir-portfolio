@@ -22,8 +22,9 @@ export default {
         'outline-variant': '#c6c6c6',
       },
       fontFamily: {
-        sans: ['Manrope', 'system-ui', 'sans-serif'],
-        editorial: ['Manrope', 'sans-serif'],
+        sans: ['Geist', 'system-ui', 'sans-serif'],
+        display: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
+        editorial: ['"Space Grotesk"', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
         tightest: '-0.02em',

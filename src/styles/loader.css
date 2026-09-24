@@ -5,7 +5,7 @@
   overflow: hidden;
   background: radial-gradient(120% 90% at 50% 20%, #17161a 0%, #0b0b0d 55%, #060607 100%);
   color: #f3f3f3;
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: var(--font-body);
   clip-path: inset(0% 0% 0% 0%);
   will-change: clip-path;
 }
@@ -124,6 +124,7 @@
 }
 
 .np-count-inner {
+  font-family: var(--font-heading);
   display: inline-flex;
   align-items: flex-start;
   font-size: clamp(5rem, 17vw, 14rem);
