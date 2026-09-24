@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import LoadingScreen from './components/LoadingScreen';
 import { setLenis } from './utils/lenis';
+import { hasFinePointer } from './utils/pointer';
 import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
 import ParticleCanvas from './components/ParticleCanvas';
@@ -75,9 +76,10 @@ export default function App() {
   return (
     <div className="bg-white text-gray-900 flex flex-col min-h-screen overflow-x-clip">
       {loading && <LoadingScreen onFinish={handleLoaded} />}
-      <CustomCursor />
+      {/* Cursor effects only with a real mouse – on touch screens taps would trigger them */}
+      {hasFinePointer() && <CustomCursor />}
       {/* Particle Canvas on hover/mouse move */}
-      <ParticleCanvas />
+      {hasFinePointer() && <ParticleCanvas />}
 
       {/* Navbar */}
       <Navbar />

@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import { hasFinePointer } from '../utils/pointer';
 
 const LENS_RADIUS = 78;
 const START_RADIUS = 16; // the site cursor is a 32px ball – the lens grows out of it
@@ -17,8 +18,11 @@ export default function ColorLensImage({ src, alt, className = '', imgClassName 
   const colorRef = useRef(null);
   const rimRef = useRef(null);
   const ringsRef = useRef(null);
+  // Phones/tablets get the plain photo – no lens, rim or ripples at all.
+  const [lensEnabled] = useState(hasFinePointer);
 
   useEffect(() => {
+    if (!lensEnabled) return undefined;
     const wrap = wrapRef.current;
     const color = colorRef.current;
     const rim = rimRef.current;
@@ -101,9 +105,17 @@ export default function ColorLensImage({ src, alt, className = '', imgClassName 
       wrap.removeEventListener('pointerdown', onDown);
       gsap.killTweensOf([lens, color, ...rings]);
     };
-  }, []);
+  }, [lensEnabled]);
 
   const ringSize = LENS_RADIUS * 2 * 1.5;
+
+  if (!lensEnabled) {
+    return (
+      <div className={`relative ${className}`}>
+        <img src={src} alt={alt} className={`w-full h-full object-cover ${imgClassName}`} draggable="false" />
+      </div>
+    );
+  }
 
   return (
     // data-cursor="lens" tells CustomCursor to hide its ball here – the lens takes over.

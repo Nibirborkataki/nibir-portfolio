@@ -6,6 +6,7 @@ import { Observer } from 'gsap/Observer';
 import { useGSAP } from '@gsap/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getLenis } from '../utils/lenis';
+import { FINE_POINTER, COARSE_POINTER, hasFinePointer } from '../utils/pointer';
 
 gsap.registerPlugin(ScrollTrigger, Observer);
 
@@ -28,164 +29,191 @@ export default function InfiniteMarquee() {
   const apiRef = useRef(null);
   const dragRef = useRef(null);
 
-  // When the line reaches the middle of the screen the page pauses in place (the sections
-  // above and below stay visible) and scroll input moves the sentence sideways instead.
-  // Once the sentence is complete, scrolling carries on; the same in reverse going up.
   useGSAP(
     () => {
       const text = textRef.current;
-      const html = document.documentElement;
       const distance = () => Math.max(1, text.scrollWidth - window.innerWidth);
-      const setX = gsap.quickTo(text, 'x', { duration: 0.5, ease: 'power3.out' });
+      const mm = gsap.matchMedia();
 
-      // mode: 'before' = sentence at start, page above; 'after' = sentence done, page below.
-      // velocity is in progress-per-frame and drives the glide after input stops.
-      const state = {
-        progress: 0,
-        mode: 'before',
-        locked: false,
-        bypassUntil: 0,
-        velocity: 0,
-        lastInput: 0,
-        touching: false,
-      };
-      const render = () => setX(-state.progress * distance());
-      const clampGlide = gsap.utils.clamp(-MAX_GLIDE, MAX_GLIDE);
-
-      const glide = () => {
-        if (state.touching || Math.abs(state.velocity) < 0.00002) return;
-        if (performance.now() - state.lastInput < 60) return; // still receiving input
-        const ratio = gsap.ticker.deltaRatio(60);
-        state.progress = gsap.utils.clamp(0, 1, state.progress + state.velocity * ratio);
-        state.velocity = state.progress === 0 || state.progress === 1 ? 0 : state.velocity * Math.pow(FRICTION, ratio);
-        render();
-      };
-      gsap.ticker.add(glide);
-
-      const scrollTo = (y) => {
-        const lenis = getLenis();
-        if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
-        else window.scrollTo(0, y);
-      };
-
-      const observer = Observer.create({
-        target: window,
-        type: 'wheel,touch',
-        wheelSpeed: -1, // make wheel and touch agree: negative deltaY = "scroll down"
-        preventDefault: true,
-        onPress: () => {
-          state.touching = true;
-          state.velocity = 0;
-        },
-        onRelease: (self) => {
-          state.touching = false;
-          if (!state.locked) return;
-          // Carry the flick's speed into the glide (velocityY is px/s of the finger).
-          state.velocity = clampGlide((-self.velocityY * TOUCH_SPEED) / distance() / 60 * 0.55);
-        },
-        onChangeY: (self) => {
-          if (!state.locked) return;
-          const isTouch = self.event.type.startsWith('touch');
-          const intent = -self.deltaY * (isTouch ? TOUCH_SPEED : WHEEL_SPEED);
-          // At either end, one more push in that direction releases the page.
-          if (state.progress >= 1 && intent > 0) return unlock('after');
-          if (state.progress <= 0 && intent < 0) return unlock('before');
-          const delta = intent / distance();
-          state.progress = gsap.utils.clamp(0, 1, state.progress + delta);
-          state.lastInput = performance.now();
-          if (!isTouch) state.velocity = clampGlide(delta * WHEEL_GLIDE);
-          render();
-        },
+      // Touch screens: the sentence glides sideways in step with normal scrolling and is
+      // complete before the line leaves the screen. Holding the page still isn't reliable
+      // with phone momentum scrolling (it caused jumps), so no scroll-hijacking here.
+      mm.add(COARSE_POINTER, () => {
+        apiRef.current = null;
+        gsap.fromTo(
+          text,
+          { x: 0 },
+          {
+            x: () => -distance(),
+            ease: 'none',
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: 'top 85%',
+              end: 'bottom 15%',
+              scrub: 0.5,
+              invalidateOnRefresh: true,
+            },
+          }
+        );
       });
-      observer.disable();
 
-      // While locked, hold the page exactly in place – phone scroll momentum can otherwise
-      // keep carrying the page after the lock engages.
-      const holdPosition = () => {
-        if (state.locked && Math.abs(window.scrollY - trigger.start) > 1) window.scrollTo(0, trigger.start);
-      };
-      window.addEventListener('scroll', holdPosition, { passive: true });
+      // Mouse/trackpad: when the line reaches the middle of the screen the page pauses in
+      // place (the sections above and below stay visible) and scroll input moves the sentence
+      // sideways instead. Once it's complete, scrolling carries on; the same in reverse.
+      mm.add(FINE_POINTER, () => {
+        const html = document.documentElement;
+        const setX = gsap.quickTo(text, 'x', { duration: 0.5, ease: 'power3.out' });
 
-      const lock = () => {
-        state.locked = true;
-        scrollTo(trigger.start);
-        getLenis()?.stop();
-        html.style.overflow = 'hidden'; // stops native/touch momentum on mobile
-        observer.enable();
-      };
+        // mode: 'before' = sentence at start, page above; 'after' = sentence done, page below.
+        // velocity is in progress-per-frame and drives the glide after input stops.
+        const state = {
+          progress: 0,
+          mode: 'before',
+          locked: false,
+          bypassUntil: 0,
+          velocity: 0,
+          lastInput: 0,
+          touching: false,
+        };
+        const render = () => setX(-state.progress * distance());
+        const clampGlide = gsap.utils.clamp(-MAX_GLIDE, MAX_GLIDE);
 
-      function unlock(mode) {
-        state.locked = false;
-        state.velocity = 0;
-        state.mode = mode;
-        state.progress = mode === 'after' ? 1 : 0;
-        render();
+        const glide = () => {
+          if (state.touching || Math.abs(state.velocity) < 0.00002) return;
+          if (performance.now() - state.lastInput < 60) return; // still receiving input
+          const ratio = gsap.ticker.deltaRatio(60);
+          state.progress = gsap.utils.clamp(0, 1, state.progress + state.velocity * ratio);
+          state.velocity = state.progress === 0 || state.progress === 1 ? 0 : state.velocity * Math.pow(FRICTION, ratio);
+          render();
+        };
+        gsap.ticker.add(glide);
+
+        const scrollTo = (y) => {
+          const lenis = getLenis();
+          if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+          else window.scrollTo(0, y);
+        };
+
+        const observer = Observer.create({
+          target: window,
+          type: 'wheel,touch',
+          wheelSpeed: -1, // make wheel and touch agree: negative deltaY = "scroll down"
+          preventDefault: true,
+          onPress: () => {
+            state.touching = true;
+            state.velocity = 0;
+          },
+          onRelease: (self) => {
+            state.touching = false;
+            if (!state.locked) return;
+            // Carry the flick's speed into the glide (velocityY is px/s of the finger).
+            state.velocity = clampGlide((-self.velocityY * TOUCH_SPEED) / distance() / 60 * 0.55);
+          },
+          onChangeY: (self) => {
+            if (!state.locked) return;
+            const isTouch = self.event.type.startsWith('touch');
+            const intent = -self.deltaY * (isTouch ? TOUCH_SPEED : WHEEL_SPEED);
+            // At either end, one more push in that direction releases the page.
+            if (state.progress >= 1 && intent > 0) return unlock('after');
+            if (state.progress <= 0 && intent < 0) return unlock('before');
+            const delta = intent / distance();
+            state.progress = gsap.utils.clamp(0, 1, state.progress + delta);
+            state.lastInput = performance.now();
+            if (!isTouch) state.velocity = clampGlide(delta * WHEEL_GLIDE);
+            render();
+          },
+        });
         observer.disable();
-        html.style.overflow = '';
-        getLenis()?.start();
-        // Step just past the trigger so it doesn't immediately re-lock.
-        scrollTo(trigger.start + (mode === 'after' ? 2 : -2));
-      }
 
-      const crossing = (self, mode) => {
-        const skip = performance.now() < state.bypassUntil || Math.abs(self.getVelocity()) > SKIP_VELOCITY;
-        if (skip) {
+        // While locked, hold the page exactly in place – phone scroll momentum can otherwise
+        // keep carrying the page after the lock engages.
+        const holdPosition = () => {
+          if (state.locked && Math.abs(window.scrollY - trigger.start) > 1) window.scrollTo(0, trigger.start);
+        };
+        window.addEventListener('scroll', holdPosition, { passive: true });
+
+        const lock = () => {
+          state.locked = true;
+          scrollTo(trigger.start);
+          getLenis()?.stop();
+          html.style.overflow = 'hidden'; // stops native/touch momentum on mobile
+          observer.enable();
+        };
+
+        function unlock(mode) {
+          state.locked = false;
+          state.velocity = 0;
           state.mode = mode;
           state.progress = mode === 'after' ? 1 : 0;
           render();
-          return;
-        }
-        lock();
-      };
-
-      const trigger = ScrollTrigger.create({
-        trigger: containerRef.current,
-        start: 'center center',
-        end: '+=1',
-        onEnter: (self) => state.mode !== 'after' && crossing(self, 'after'),
-        onEnterBack: (self) => state.mode !== 'before' && crossing(self, 'before'),
-        onRefresh: () => {
-          if (!state.locked) gsap.set(text, { x: -state.progress * distance() });
-        },
-      });
-
-      // Landing mid-page (reload / deep link) below the line: show it completed.
-      if (window.scrollY > trigger.start) {
-        state.mode = 'after';
-        state.progress = 1;
-        gsap.set(text, { x: -distance() });
-      }
-
-      // In-page nav links and "back to top" jump straight past the marquee.
-      const onClick = (e) => {
-        if (e.target.closest?.('a[href^="#"], [data-scroll-jump]')) state.bypassUntil = performance.now() + 2500;
-      };
-      document.addEventListener('click', onClick, true);
-
-      apiRef.current = {
-        getProgress: () => state.progress,
-        setProgress: (p) => {
-          state.progress = gsap.utils.clamp(0, 1, p);
-          state.velocity = 0;
-          state.lastInput = performance.now();
-          render();
-        },
-        fling: (v) => {
-          state.velocity = clampGlide(v);
-        },
-        distance,
-      };
-
-      return () => {
-        gsap.ticker.remove(glide);
-        window.removeEventListener('scroll', holdPosition);
-        document.removeEventListener('click', onClick, true);
-        if (state.locked) {
+          observer.disable();
           html.style.overflow = '';
           getLenis()?.start();
+          // Step just past the trigger so it doesn't immediately re-lock.
+          scrollTo(trigger.start + (mode === 'after' ? 2 : -2));
         }
-        observer.kill();
-      };
+
+        const crossing = (self, mode) => {
+          const skip = performance.now() < state.bypassUntil || Math.abs(self.getVelocity()) > SKIP_VELOCITY;
+          if (skip) {
+            state.mode = mode;
+            state.progress = mode === 'after' ? 1 : 0;
+            render();
+            return;
+          }
+          lock();
+        };
+
+        const trigger = ScrollTrigger.create({
+          trigger: containerRef.current,
+          start: 'center center',
+          end: '+=1',
+          onEnter: (self) => state.mode !== 'after' && crossing(self, 'after'),
+          onEnterBack: (self) => state.mode !== 'before' && crossing(self, 'before'),
+          onRefresh: () => {
+            if (!state.locked) gsap.set(text, { x: -state.progress * distance() });
+          },
+        });
+
+        // Landing mid-page (reload / deep link) below the line: show it completed.
+        if (window.scrollY > trigger.start) {
+          state.mode = 'after';
+          state.progress = 1;
+          gsap.set(text, { x: -distance() });
+        }
+
+        // In-page nav links and "back to top" jump straight past the marquee.
+        const onClick = (e) => {
+          if (e.target.closest?.('a[href^="#"], [data-scroll-jump]')) state.bypassUntil = performance.now() + 2500;
+        };
+        document.addEventListener('click', onClick, true);
+
+        apiRef.current = {
+          getProgress: () => state.progress,
+          setProgress: (p) => {
+            state.progress = gsap.utils.clamp(0, 1, p);
+            state.velocity = 0;
+            state.lastInput = performance.now();
+            render();
+          },
+          fling: (v) => {
+            state.velocity = clampGlide(v);
+          },
+          distance,
+        };
+
+        return () => {
+          gsap.ticker.remove(glide);
+          window.removeEventListener('scroll', holdPosition);
+          document.removeEventListener('click', onClick, true);
+          if (state.locked) {
+            html.style.overflow = '';
+            getLenis()?.start();
+          }
+          observer.kill();
+          apiRef.current = null;
+        };
+      });
     },
     { scope: containerRef }
   );
@@ -243,12 +271,12 @@ export default function InfiniteMarquee() {
   };
 
   const handleMouseMove = (e) => {
-    if (window.innerWidth < 768) return;
+    if (!hasFinePointer()) return;
     gsap.to(cursorRef.current, { x: e.clientX, y: e.clientY, duration: 0.15, ease: 'power2.out' });
   };
 
   const handleMouseEnter = (e) => {
-    if (window.innerWidth < 768) return;
+    if (!hasFinePointer()) return;
     gsap.set(cursorRef.current, { x: e.clientX, y: e.clientY });
     gsap.to(cursorRef.current, { scale: 1, opacity: 1, duration: 0.3 });
   };

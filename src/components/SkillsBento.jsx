@@ -32,21 +32,20 @@ export default function SkillsBento() {
 
       const mm = gsap.matchMedia();
 
-      // Mobile: each card tilts up into place as it scrolls into view.
+      // Mobile: each card follows the scroll – it rises from below, grows to full size and
+      // its rounded inset opens out to the full card as it comes into view.
       mm.add('(max-width: 767px)', () => {
         gsap.utils.toArray('.bento-card').forEach((card) => {
           gsap.fromTo(
             card,
-            { y: 70, opacity: 0, rotationX: 12, scale: 0.96, transformPerspective: 900, transformOrigin: '50% 0%' },
+            { y: 90, scale: 0.9, opacity: 0, clipPath: 'inset(6% 5% 0% 5% round 18px)' },
             {
               y: 0,
-              opacity: 1,
-              rotationX: 0,
               scale: 1,
-              transformPerspective: 900,
-              duration: 0.9,
-              ease: 'power3.out',
-              scrollTrigger: { trigger: card, start: 'top 92%', toggleActions: 'play none none reverse' },
+              opacity: 1,
+              clipPath: 'inset(0% 0% 0% 0% round 0px)',
+              ease: 'power1.out',
+              scrollTrigger: { trigger: card, start: 'top bottom', end: 'top 68%', scrub: 0.6 },
             }
           );
         });
