@@ -30,26 +30,67 @@ export default function SkillsBento() {
         }
       );
 
-      // Bento Cards: a clean wipe up from the bottom edge, one after another
-      gsap.fromTo(
-        '.bento-card',
-        { clipPath: 'inset(100% 0% 0% 0%)', y: 24 },
-        {
-          clipPath: 'inset(0% 0% 0% 0%)',
-          y: 0,
-          stagger: 0.1,
-          duration: 0.9,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: '.bento-grid',
-            start: 'top 90%',
-            toggleActions: 'play none none reverse',
-          },
-          onComplete: () => {
-            gsap.set('.bento-card', { clearProps: 'all' });
-          },
-        }
-      );
+      const mm = gsap.matchMedia();
+
+      // Mobile: a clean wipe up from each card's bottom edge, one after another.
+      mm.add('(max-width: 767px)', () => {
+        gsap.fromTo(
+          '.bento-card',
+          { clipPath: 'inset(100% 0% 0% 0%)', y: 24 },
+          {
+            clipPath: 'inset(0% 0% 0% 0%)',
+            y: 0,
+            stagger: 0.1,
+            duration: 0.9,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: '.bento-grid',
+              start: 'top 90%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
+      });
+
+      // Desktop: the top row pushes in from the right; on the bottom row Agentic AI
+      // appears first and the two cards beside it slide out from behind it.
+      mm.add('(min-width: 768px)', () => {
+        const [uiCard, mlCard, devCard, agentCard, gfxCard] = gsap.utils.toArray('.bento-card');
+
+        gsap
+          .timeline({
+            defaults: { ease: 'power3.out' },
+            scrollTrigger: { trigger: uiCard, start: 'top 85%', toggleActions: 'play none none reverse' },
+          })
+          .fromTo(
+            [uiCard, mlCard],
+            { x: 140, opacity: 0 },
+            { x: 0, opacity: 1, duration: 1.1, stagger: 0.14 }
+          );
+
+        // Keep the middle card on top while the others slide out from underneath it.
+        gsap.set(agentCard, { position: 'relative', zIndex: 2 });
+        gsap.set([devCard, gfxCard], { position: 'relative', zIndex: 1 });
+        // Distance from each side card's own slot to the middle slot.
+        const toMiddle = (i, card) => agentCard.offsetLeft - card.offsetLeft;
+
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: agentCard,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+              invalidateOnRefresh: true,
+            },
+          })
+          .fromTo(agentCard, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' })
+          .fromTo(
+            [devCard, gfxCard],
+            { x: toMiddle, opacity: 0 },
+            { x: 0, opacity: 1, duration: 1, ease: 'power3.inOut', stagger: 0 },
+            '-=0.15'
+          );
+      });
 
       // Workflow Cards Staggered Reveal
       gsap.fromTo(

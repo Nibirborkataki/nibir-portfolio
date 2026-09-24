@@ -73,7 +73,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="bg-white text-gray-900 flex flex-col min-h-screen">
+    <div className="bg-white text-gray-900 flex flex-col min-h-screen overflow-x-clip">
       {loading && <LoadingScreen onFinish={handleLoaded} />}
       <CustomCursor />
       {/* Particle Canvas on hover/mouse move */}

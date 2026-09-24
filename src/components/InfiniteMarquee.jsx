@@ -17,8 +17,9 @@ const TOUCH_SPEED = 2.4;
 const FRICTION = 0.9;
 const WHEEL_GLIDE = 0.08; // share of each wheel step carried into the glide
 const MAX_GLIDE = 0.03; // cap, in progress per frame
-// Crossing faster than this (px/s) – e.g. a nav-link jump or a hard fling – skips the lock.
-const SKIP_VELOCITY = 6000;
+// Crossing faster than this (px/s) skips the lock. Kept very high: phone flings are fast and
+// should still stop here; nav-link jumps are handled separately via bypassUntil.
+const SKIP_VELOCITY = 20000;
 
 export default function InfiniteMarquee() {
   const containerRef = useRef(null);
@@ -98,6 +99,13 @@ export default function InfiniteMarquee() {
       });
       observer.disable();
 
+      // While locked, hold the page exactly in place – phone scroll momentum can otherwise
+      // keep carrying the page after the lock engages.
+      const holdPosition = () => {
+        if (state.locked && Math.abs(window.scrollY - trigger.start) > 1) window.scrollTo(0, trigger.start);
+      };
+      window.addEventListener('scroll', holdPosition, { passive: true });
+
       const lock = () => {
         state.locked = true;
         scrollTo(trigger.start);
@@ -148,9 +156,9 @@ export default function InfiniteMarquee() {
         gsap.set(text, { x: -distance() });
       }
 
-      // In-page nav links jump straight past the marquee.
+      // In-page nav links and "back to top" jump straight past the marquee.
       const onClick = (e) => {
-        if (e.target.closest?.('a[href^="#"]')) state.bypassUntil = performance.now() + 2500;
+        if (e.target.closest?.('a[href^="#"], [data-scroll-jump]')) state.bypassUntil = performance.now() + 2500;
       };
       document.addEventListener('click', onClick, true);
 
@@ -170,6 +178,7 @@ export default function InfiniteMarquee() {
 
       return () => {
         gsap.ticker.remove(glide);
+        window.removeEventListener('scroll', holdPosition);
         document.removeEventListener('click', onClick, true);
         if (state.locked) {
           html.style.overflow = '';

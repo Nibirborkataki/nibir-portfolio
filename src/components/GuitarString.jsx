@@ -2,17 +2,20 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 
 const WIDTH = 160;
-const HEIGHT = 48;
-const MID = HEIGHT / 2;
-const MAX_BEND = 16;
+const PAD = 12; // room above the string (and below its lowest point)
+const MAX_UP = 10;
 
 /**
  * A horizontal line that behaves like a guitar string: it bends toward the cursor while
- * hovered and, when released, vibrates back to rest with a damped wobble.
+ * hovered – down as far as `reach` px – and, when released, vibrates back to rest.
  */
-export default function GuitarString({ className = '' }) {
+export default function GuitarString({ reach = 60, className = '' }) {
   const wrapRef = useRef(null);
   const pathRef = useRef(null);
+  const reachRef = useRef(reach);
+  reachRef.current = reach;
+
+  const height = PAD + reach + PAD;
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -20,27 +23,28 @@ export default function GuitarString({ className = '' }) {
     const bend = { x: WIDTH / 2, y: 0 };
     const draw = () => {
       // Quadratic curve: the control point is pulled by twice the visible bend.
-      path.setAttribute('d', `M0 ${MID} Q ${bend.x} ${MID + bend.y * 2} ${WIDTH} ${MID}`);
+      path.setAttribute('d', `M0 ${PAD} Q ${bend.x} ${PAD + bend.y * 2} ${WIDTH} ${PAD}`);
     };
     draw();
 
-    const local = (e) => {
-      const box = wrap.getBoundingClientRect();
-      return [
-        gsap.utils.clamp(0, WIDTH, ((e.clientX - box.left) / box.width) * WIDTH),
-        gsap.utils.clamp(-MAX_BEND, MAX_BEND, ((e.clientY - box.top) / box.height) * HEIGHT - MID),
-      ];
-    };
-
     const onMove = (e) => {
-      const [x, y] = local(e);
-      gsap.to(bend, { x, y, duration: 0.18, ease: 'power2.out', overwrite: true, onUpdate: draw });
+      const box = wrap.getBoundingClientRect();
+      const x = gsap.utils.clamp(0, WIDTH, ((e.clientX - box.left) / box.width) * WIDTH);
+      const y = gsap.utils.clamp(-MAX_UP, reachRef.current, e.clientY - box.top - PAD);
+      gsap.to(bend, { x, y, duration: 0.2, ease: 'power2.out', overwrite: true, onUpdate: draw });
       gsap.to(path, { attr: { stroke: '#6b7280' }, duration: 0.2, overwrite: 'auto' });
     };
 
     const release = () => {
-      // Pluck: snap through the rest position and ring out.
-      gsap.to(bend, { y: 0, duration: 2.4, ease: 'elastic.out(1.1, 0.06)', overwrite: true, onUpdate: draw });
+      // Pluck: snap through the rest position and ring out – deeper pulls ring longer.
+      const depth = Math.min(Math.abs(bend.y) / reachRef.current, 1);
+      gsap.to(bend, {
+        y: 0,
+        duration: 1.8 + depth * 1.2,
+        ease: 'elastic.out(1.1, 0.06)',
+        overwrite: true,
+        onUpdate: draw,
+      });
       gsap.to(path, { attr: { stroke: '#d1d5db' }, duration: 1.2, delay: 0.3, overwrite: 'auto' });
     };
 
@@ -54,9 +58,9 @@ export default function GuitarString({ className = '' }) {
   }, []);
 
   return (
-    <div ref={wrapRef} className={`cursor-pointer ${className}`} style={{ width: WIDTH, height: HEIGHT }} aria-hidden="true">
-      <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="overflow-visible">
-        <path ref={pathRef} d={`M0 ${MID} L${WIDTH} ${MID}`} fill="none" stroke="#d1d5db" strokeWidth="4" strokeLinecap="round" />
+    <div ref={wrapRef} className={`cursor-pointer ${className}`} style={{ width: WIDTH, height }} aria-hidden="true">
+      <svg width={WIDTH} height={height} viewBox={`0 0 ${WIDTH} ${height}`} className="overflow-visible">
+        <path ref={pathRef} d={`M0 ${PAD} L${WIDTH} ${PAD}`} fill="none" stroke="#d1d5db" strokeWidth="4" strokeLinecap="round" />
       </svg>
     </div>
   );

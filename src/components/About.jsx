@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -9,6 +9,25 @@ gsap.registerPlugin(ScrollTrigger);
 export default function About() {
   const sectionRef = useRef(null);
   const textRef = useRef(null);
+  const barRef = useRef(null);
+  // How far the string may bend: down to the "I thrive on…" line (depends on text wrapping).
+  const [stringReach, setStringReach] = useState(88);
+
+  useEffect(() => {
+    const measure = () => {
+      const bar = barRef.current;
+      const target = textRef.current?.querySelector('[data-string-target]');
+      if (!bar || !target || !bar.offsetParent) return;
+      const barTop = bar.getBoundingClientRect().top;
+      const t = target.getBoundingClientRect();
+      // String sits 12px below the bar's top edge; aim for the middle of that line.
+      setStringReach(Math.max(40, Math.round(t.top + t.height / 2 - (barTop + 12))));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(textRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   useGSAP(
     () => {
@@ -53,9 +72,9 @@ export default function About() {
     { scope: sectionRef }
   );
 
-  const splitText = (text) => {
+  const splitText = (text, markFirst = false) => {
     return text.split(' ').map((word, i) => (
-      <span key={i} className="word opacity-20">
+      <span key={i} className="word opacity-20" data-string-target={markFirst && i === 0 ? '' : undefined}>
         {word}{' '}
       </span>
     ));
@@ -66,8 +85,8 @@ export default function About() {
       <h2 className="about-title text-3xl font-bold text-start text-gray-800 mb-6">About Me</h2>
       <div className="flex flex-col md:flex-row items-start gap-4">
         {/* Hover it: it plucks like a guitar string */}
-        <div className="about-bar shrink-0 hidden md:block -mt-2.5">
-          <GuitarString />
+        <div ref={barRef} className="about-bar shrink-0 hidden md:block mt-1">
+          <GuitarString reach={stringReach} />
         </div>
         <p ref={textRef} className="about-text text-gray-700 text-lg leading-relaxed flex-1">
           {splitText("Hello! I'm a passionate developer and designer who has recently completed a Master's in Information Technology. Over the past 3 years, I've been honing my skills in")}
@@ -76,7 +95,7 @@ export default function About() {
           </strong>
           <br />
           <br />
-          {splitText("I thrive on turning complex ideas into intuitive and elegant solutions. From building clean frontends to managing robust backends, I enjoy every step of the development process.")}
+          {splitText("I thrive on turning complex ideas into intuitive and elegant solutions. From building clean frontends to managing robust backends, I enjoy every step of the development process.", true)}
           <br />
           <br />
           {splitText("Outside of work, you'll find me sketching abstract art, strumming my guitar, exploring scenic bike trails, or planning my next travel adventure. These hobbies keep my creativity alive and constantly inspire my work.")}

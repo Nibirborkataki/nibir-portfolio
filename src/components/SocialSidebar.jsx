@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Github, Linkedin, Instagram, Facebook, ArrowUp } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { getLenis } from '../utils/lenis';
 
 const WhatsappIcon = ({ size = 20 }) => (
   <svg
@@ -33,7 +34,9 @@ export default function SocialSidebar() {
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(0);
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   useGSAP(
@@ -114,6 +117,7 @@ export default function SocialSidebar() {
       {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
+        data-scroll-jump
         className={`fixed right-6 bottom-8 z-50 p-3 bg-black text-white rounded-full shadow-lg transform transition-all duration-300 hover:bg-gray-800 hover:-translate-y-1 ${showScrollTop ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-10 invisible'}`}
         aria-label="Scroll to top"
       >
