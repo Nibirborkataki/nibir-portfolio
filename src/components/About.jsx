@@ -81,7 +81,7 @@ export default function About() {
   };
 
   return (
-    <section ref={sectionRef} className="max-w-7xl mx-auto px-6 py-12 bg-white mt-10">
+    <section ref={sectionRef} className="max-w-7xl mx-auto px-6 py-12 mt-10">
       <h2 className="about-title text-3xl font-bold text-start text-gray-800 mb-6">About Me</h2>
       <div className="flex flex-col md:flex-row items-start gap-4">
         {/* Hover it: it plucks like a guitar string */}

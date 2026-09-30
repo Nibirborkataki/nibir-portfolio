@@ -290,7 +290,7 @@ export default function InfiniteMarquee() {
     <section
       id="horizontal-scroll"
       ref={containerRef}
-      className="relative w-full py-16 md:py-24 bg-white md:border-y border-gray-100 flex items-center overflow-hidden md:cursor-none select-none"
+      className="relative w-full py-16 md:py-24 md:border-y border-gray-100 flex items-center overflow-hidden md:cursor-none select-none"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
