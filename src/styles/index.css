@@ -157,3 +157,13 @@
   .art-flow, .art-pulse { animation: none; }
   .art-draw, .is-inview .art-draw { animation: none; stroke-dashoffset: 0; }
 }
+
+/* Network background – fades in once the page is revealed */
+.network-bg {
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+
+.network-bg.is-visible {
+  opacity: 1;
+}

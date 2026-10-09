@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import gsap from 'gsap';
@@ -20,13 +20,11 @@ import Projects from './components/Projects';
 import Testimonials from './components/Testimonials';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-
-// three.js is only downloaded when the 3D side scene is actually shown.
-const SideScene = lazy(() => import('./components/SideScene'));
+import NetworkBackground from './components/NetworkBackground';
 
 export default function App() {
   const [loading, setLoading] = useState(true);
-  const [showScene, setShowScene] = useState(false);
+  const [showBackground, setShowBackground] = useState(false);
   const lenisRef = useRef(null);
 
   useEffect(() => {
@@ -75,18 +73,16 @@ export default function App() {
     document.documentElement.style.overflow = '';
     lenisRef.current?.start();
     ScrollTrigger.refresh();
-    // 3D side sculptures: desktop (real mouse) only, and not for reduced-motion visitors.
-    if (hasFinePointer() && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setShowScene(true);
-    }
+    // The network background fades in once the page is revealed.
+    setShowBackground(true);
   }, []);
 
   return (
-    // No background here: the page's white comes from <body>, so the 3D layer (behind all
-    // content) can show through in the empty side space.
+    // No background here: the page's white comes from <body>, so the network layer
+    // (behind all content) can show through.
     <div className="text-gray-900 flex flex-col min-h-screen overflow-x-clip">
       {loading && <LoadingScreen onFinish={handleLoaded} />}
-      <Suspense fallback={null}>{showScene && <SideScene />}</Suspense>
+      {showBackground && <NetworkBackground />}
       {/* Cursor effects only with a real mouse – on touch screens taps would trigger them */}
       {hasFinePointer() && <CustomCursor />}
       {/* Particle Canvas on hover/mouse move */}
