@@ -167,3 +167,68 @@
 .network-bg.is-visible {
   opacity: 1;
 }
+
+/* FinSense card: types a spend, AI files it, the breakdown draws, an insight appears – looped */
+.fs-type {
+  transform-box: fill-box;
+  transform-origin: right center;
+}
+
+.fs-card,
+.fs-insight {
+  transform-box: fill-box;
+}
+
+.is-inview .fs-type {
+  animation: fs-type 8s steps(20) infinite;
+}
+
+.is-inview .fs-send {
+  animation: art-pulse 1.2s ease-in-out infinite;
+}
+
+.is-inview .fs-card {
+  animation: fs-card 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.is-inview .fs-insight {
+  animation: fs-insight 8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+.is-inview .fs-seg {
+  animation: fs-seg 1.4s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes fs-type {
+  0% { transform: scaleX(1); }
+  25%, 94% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes fs-card {
+  0%, 28% { opacity: 0; translate: 0 10px; }
+  36%, 92% { opacity: 1; translate: 0 0; }
+  100% { opacity: 0; translate: 0 0; }
+}
+
+@keyframes fs-insight {
+  0%, 44% { opacity: 0; translate: 0 10px; }
+  52%, 92% { opacity: 1; translate: 0 0; }
+  100% { opacity: 0; translate: 0 0; }
+}
+
+@keyframes fs-seg {
+  from { stroke-dasharray: 0 100; }
+  to { stroke-dasharray: var(--len) 100; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-inview .fs-type,
+  .is-inview .fs-send,
+  .is-inview .fs-card,
+  .is-inview .fs-insight,
+  .is-inview .fs-seg {
+    animation: none;
+  }
+  .fs-type { transform: scaleX(0); }
+}

@@ -195,8 +195,8 @@ export function FitArt() {
           strokeDasharray={`${c * 0.72} ${c}`}
           transform="rotate(-90)"
         />
-        <text textAnchor="middle" y="-2" fontSize="26" fontWeight="800" fill={INK}>72%</text>
-        <text textAnchor="middle" y="16" fontSize="9" fontWeight="700" fill={MID} letterSpacing="1">WEEKLY GOAL</text>
+        <text textAnchor="middle" y="-2" fontSize="26" fontWeight="800" fill={INK}>22.9</text>
+        <text textAnchor="middle" y="16" fontSize="9" fontWeight="700" fill={MID} letterSpacing="1">BMI · HEALTHY</text>
       </g>
       <path
         d="M40 262 H110 L122 240 L136 282 L150 226 L162 262 H200"
@@ -230,6 +230,89 @@ export function FitArt() {
           </g>
         ))}
       </g>
+    </Frame>
+  );
+}
+
+// FinSense: a spend typed in plain language is understood by AI, filed under the right
+// category, counted in the monthly breakdown and turned into an insight. Loops while the
+// card is on screen (animation classes in index.css).
+const SPEND = [
+  ['Food', 32, INK],
+  ['Rent', 28, MID],
+  ['Travel', 14, '#71717a'],
+  ['Shopping', 12, DIM],
+  ['Other', 14, '#3f3f46'],
+];
+
+export function FinSenseArt() {
+  let start = 0;
+  return (
+    <Frame id="fin">
+      {/* "just say it" input */}
+      <g transform="translate(28 58)">
+        <rect width="240" height="40" rx="20" fill={FAINT} stroke={DIM} />
+        <text x="16" y="25" fontSize="12.5" fontWeight="600" fill={INK}>Spent ₹450 on dinner</text>
+        <rect className="fs-type" x="14" y="9" width="160" height="23" fill={FAINT} />
+        <circle cx="222" cy="20" r="11" fill={INK} className="fs-send" />
+        <path d="M217 20 h9 M222.5 15.5 l4.5 4.5 l-4.5 4.5" stroke="#18181b" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      </g>
+      <path d="M60 103 V119" stroke={MID} strokeWidth="1.2" strokeDasharray="3 4" className="art-flow" />
+
+      {/* understood + categorised */}
+      <g className="fs-card" transform="translate(28 124)">
+        <rect width="240" height="62" rx="12" fill={INK} />
+        <rect x="12" y="13" width="36" height="36" rx="9" fill="#18181b" />
+        <path d="M24 22 v8 a4 4 0 0 0 8 0 v-8 M28 30 v11 M37 22 v19 M37 22 c3 2 3 8 0 9" stroke={INK} strokeWidth="1.8" fill="none" strokeLinecap="round" />
+        <text x="58" y="28" fontSize="12" fontWeight="800" fill="#18181b">Food &amp; Dining</text>
+        <text x="58" y="43" fontSize="9" fontWeight="600" fill="#71717a">Dinner · Today</text>
+        <text x="228" y="34" textAnchor="end" fontSize="14" fontWeight="800" fill="#18181b">−₹450</text>
+        <rect x="150" y="-9" width="88" height="18" rx="9" fill="#18181b" stroke={DIM} />
+        <text x="194" y="3.5" textAnchor="middle" fontSize="8" fontWeight="800" fill={INK} letterSpacing="0.6">✦ AI SORTED</text>
+      </g>
+
+      {/* insight */}
+      <g className="fs-insight" transform="translate(28 200)">
+        <rect width="240" height="76" rx="12" fill={FAINT} stroke={DIM} />
+        <path d="M18 22 l2.5 -7 l2.5 7 l7 2.5 l-7 2.5 l-2.5 7 l-2.5 -7 l-7 -2.5 z" fill={INK} className="art-pulse" />
+        <text x="38" y="28" fontSize="8.5" fontWeight="800" fill={MID} letterSpacing="1.2">FINSENSE INSIGHT</text>
+        <text x="16" y="50" fontSize="11" fontWeight="600" fill={INK}>Food is 32% of your spend –</text>
+        <text x="16" y="64" fontSize="11" fontWeight="600" fill={INK}>₹1,200 above last month.</text>
+      </g>
+
+      {/* monthly breakdown */}
+      <g transform="translate(372 120)">
+        <circle r="62" fill="none" stroke={FAINT} strokeWidth="16" />
+        <g transform="rotate(-90)">
+          {SPEND.map(([name, pct, color], i) => {
+            const offset = -start;
+            start += pct;
+            return (
+              <circle
+                key={name}
+                className="fs-seg"
+                r="62"
+                fill="none"
+                stroke={color}
+                strokeWidth="16"
+                pathLength="100"
+                strokeDashoffset={offset}
+                style={{ '--len': pct - 1.2, strokeDasharray: `${pct - 1.2} 100`, animationDelay: `${0.25 + i * 0.18}s` }}
+              />
+            );
+          })}
+        </g>
+        <text textAnchor="middle" y="2" fontSize="19" fontWeight="800" fill={INK}>₹18.4k</text>
+        <text textAnchor="middle" y="18" fontSize="8" fontWeight="700" fill={MID} letterSpacing="1.2">THIS MONTH</text>
+      </g>
+      {SPEND.slice(0, 3).map(([name, pct, color], i) => (
+        <g key={name} transform={`translate(${318 + i * 46} 222)`}>
+          <circle cx="4" cy="-3" r="4" fill={color} />
+          <text x="12" y="0" fontSize="8.5" fontWeight="700" fill={INK}>{pct}%</text>
+          <text x="0" y="14" fontSize="8" fontWeight="600" fill={MID}>{name}</text>
+        </g>
+      ))}
+      <text x="372" y="262" textAnchor="middle" fontSize="9" fontWeight="700" fill={MID} letterSpacing="1">Understand your money</text>
     </Frame>
   );
 }

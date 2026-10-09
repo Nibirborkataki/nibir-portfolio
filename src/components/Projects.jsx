@@ -2,22 +2,24 @@ import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { RagArt, DapoonArt, FloatifyArt, FitArt } from './ProjectArt';
+import { FinSenseArt, DapoonArt, FloatifyArt, FitArt } from './ProjectArt';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// The first project is the main one: it gets a full-width card on desktop.
 const FEATURED = [
   {
-    title: 'Personal AI RAG',
-    subtitle: 'PDF Knowledge Assistant',
+    title: 'FinSense AI',
+    subtitle: 'AI Money Tracker',
     badge: 'Personal Project',
     description:
-      'Ask anything about your PDFs. Documents are chunked and indexed, and answers come from an Ollama model running entirely on my own machine — nothing leaves the system.',
-    tags: ['Ollama', 'RAG Pipeline', 'Python', 'Local LLM'],
-    footer: 'Local AI',
-    link: { href: 'https://github.com/Nibirborkataki/LocalRAG-AI', label: 'View on GitHub' },
-    Art: RagArt,
-    span: 'lg:col-span-6',
+      'Log spending in plain language – “Spent ₹450 on dinner” – and Google Gemini turns it into categorised transactions, a clear monthly breakdown and honest insights, so you can ask things like “Can I afford a PS5 next month?” before the money leaves your account.',
+    tags: ['Gemini API', 'Natural Language', 'AI Insights', 'Fintech'],
+    footer: 'Fintech · Live',
+    link: { href: 'https://finsense-gjis.vercel.app/', label: 'Visit FinSense' },
+    Art: FinSenseArt,
+    span: 'lg:col-span-12',
+    wide: true,
   },
   {
     title: 'Sanskritir Dapoon',
@@ -27,9 +29,9 @@ const FEATURED = [
       'An e-newspaper platform for a cultural organisation, with paid subscriptions through a payment gateway, SMS notifications and JWT-secured reader accounts.',
     tags: ['Payment Gateway', 'SMS API', 'JWT Auth', 'Node.js'],
     footer: 'E-publishing & media',
-    link: { href: 'https://www.sanskritirdapoon.in', label: 'Visit sanskritirdapoon.in' },
+    link: { href: 'https://www.sanskritirdapoon.in', label: 'Visit site' },
     Art: DapoonArt,
-    span: 'lg:col-span-6',
+    span: 'lg:col-span-4',
   },
   {
     title: 'Floatify',
@@ -39,41 +41,44 @@ const FEATURED = [
       'Python scrapers pull fund factsheet PDFs, scheduled cron jobs extract the data and compute CAGR, and the results are presented as clean, comparable fund insights.',
     tags: ['Python', 'Web Scraping', 'Cron Jobs', 'PDF Extraction'],
     footer: 'Fintech',
-    link: { href: 'https://floatify.in', label: 'Visit floatify.in' },
+    link: { href: 'https://floatify.in', label: 'Visit site' },
     Art: FloatifyArt,
-    span: 'lg:col-span-6',
+    span: 'lg:col-span-4',
   },
   {
     title: 'FitAI',
     subtitle: 'AI Fitness Coach',
     badge: 'Personal Project',
     description:
-      'A fitness app in progress: it takes your details and goals, and the Gemini API returns a personal plan — exercises to do, and what to avoid.',
-    tags: ['Gemini API', 'Workout Plans', 'Health'],
-    footer: 'Health tech · In development',
+      'Now live (v1): tell it your body, goal and equipment and it gives you your numbers – BMI, daily calories, heart-rate zones – a weekly training plan written for you, and a Gemini coach you can ask anything.',
+    tags: ['Gemini API', 'Training Plans', 'Health Metrics'],
+    footer: 'Health tech · Live v1',
+    link: { href: 'https://fit-ai-sigma-blue.vercel.app/', label: 'Visit FitAI' },
     Art: FitArt,
-    span: 'lg:col-span-6',
+    span: 'lg:col-span-4',
   },
 ];
 
 const MORE = [
   {
-    title: 'CyberCafe Job Board',
-    meta: 'Freelance pitch · Django · Admin panel',
-    summary: 'Admin posts job advertisements; visitors browse the live listings.',
-    status: 'Pitched',
+    title: 'Personal AI RAG',
+    meta: 'Personal project · Ollama · Local LLM',
+    summary: 'Chat with your PDFs, answered by a model running entirely on my own machine.',
+    status: 'GitHub',
+    href: 'https://github.com/Nibirborkataki/LocalRAG-AI',
+  },
+  {
+    title: 'Wedding Photography',
+    meta: 'Client project · Portfolio & booking',
+    summary: 'A studio website with portfolio, collections and enquiries for a wedding photographer.',
+    status: 'Live',
+    href: 'https://weeding-photography.vercel.app/',
   },
   {
     title: 'Gym Website',
     meta: 'Personal project · Responsive web',
-    summary: 'A clean, responsive website for a gym and its members.',
-    status: 'Personal',
-  },
-  {
-    title: 'Wedding Photography Booking',
-    meta: 'Client project · Booking website',
-    summary: 'A booking website for a wedding photographer.',
-    status: 'In discussion',
+    summary: 'A clean, responsive website for a gym and its members – link coming soon.',
+    status: 'In development',
   },
 ];
 
@@ -86,12 +91,12 @@ function Tag({ children }) {
 }
 
 function FeaturedCard({ project, index }) {
-  const { title, subtitle, badge, description, tags, footer, link, Art, span } = project;
+  const { title, subtitle, badge, description, tags, footer, link, Art, span, wide } = project;
   return (
     <article
-      className={`project-card group ${span} flex flex-col bg-surface-container-low border border-gray-200 p-4 md:p-5 rounded-sm transition-[box-shadow,border-color] duration-300 hover:border-gray-400 hover:shadow-xl`}
+      className={`project-card group ${span} flex flex-col ${wide ? 'lg:flex-row lg:gap-10' : ''} bg-surface-container-low border border-gray-200 p-4 md:p-5 rounded-sm transition-[box-shadow,border-color] duration-300 hover:border-gray-400 hover:shadow-xl`}
     >
-      <div className="relative overflow-hidden rounded-sm bg-black aspect-[8/5]">
+      <div className={`relative overflow-hidden rounded-sm bg-black aspect-[8/5] ${wide ? 'lg:w-[58%] lg:shrink-0' : ''}`}>
         <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-[1.04]">
           <Art />
         </div>
@@ -103,8 +108,13 @@ function FeaturedCard({ project, index }) {
         </span>
       </div>
 
-      <div className="flex flex-col flex-1 pt-6 px-1 md:px-2">
-        <h3 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-black leading-tight">
+      <div className={`flex flex-col flex-1 pt-6 px-1 md:px-2 ${wide ? 'lg:pt-4 lg:pr-4' : ''}`}>
+        {wide && (
+          <span className="hidden lg:inline-block self-start mb-4 text-[10px] font-bold uppercase tracking-widest text-white bg-black px-2.5 py-1">
+            Featured
+          </span>
+        )}
+        <h3 className={`${wide ? 'text-2xl md:text-4xl' : 'text-xl md:text-2xl'} font-bold uppercase tracking-tight text-black leading-tight`}>
           {title}
           <span className="block text-sm md:text-base font-semibold normal-case tracking-normal text-gray-500 mt-1">
             {subtitle}
@@ -161,9 +171,10 @@ export default function Projects() {
       const cards = gsap.utils.toArray('.project-card');
       const mm = gsap.matchMedia();
 
-      // Desktop: cards fade up in pairs, row by row.
+      // Desktop: the wide main card fades up on its own, then the row of three.
       mm.add('(min-width: 1024px)', () => {
-        for (let i = 0; i < cards.length; i += 2) reveal(cards.slice(i, i + 2), cards[i]);
+        reveal(cards.slice(0, 1), cards[0]);
+        reveal(cards.slice(1), cards[1]);
       });
 
       // Mobile/tablet: a stacking deck. Each card sticks as it arrives, and the next one
@@ -244,24 +255,37 @@ export default function Projects() {
         </div>
 
         <ul className="border-t border-gray-200">
-          {MORE.map((item, i) => (
-            <li
-              key={item.title}
-              className="project-index-item group relative grid grid-cols-[2.5rem_1fr_auto] md:grid-cols-[3rem_1fr_1fr_auto] items-center gap-x-4 gap-y-1 border-b border-gray-200 py-6 before:bg-surface-container-low before:content-[''] before:absolute before:inset-0 before:origin-bottom before:scale-y-0 before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:scale-y-100 [&>*]:relative"
-            >
-              <span className="text-[10px] font-bold tracking-widest text-gray-400 pl-1">
-                {String(FEATURED.length + i + 1).padStart(2, '0')}
-              </span>
-              <div className="transition-transform duration-300 group-hover:translate-x-1">
-                <p className="text-base md:text-lg font-bold uppercase tracking-tight text-black">{item.title}</p>
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mt-1">{item.meta}</p>
-              </div>
-              <p className="hidden md:block text-sm text-gray-500 md:text-right">{item.summary}</p>
-              <span className="text-[10px] font-bold uppercase tracking-widest border border-gray-300 text-gray-600 px-2.5 py-1 group-hover:bg-black group-hover:text-white group-hover:border-black transition-colors duration-300 mr-1">
-                {item.status}
-              </span>
-            </li>
-          ))}
+          {MORE.map((item, i) => {
+            const Row = item.href ? 'a' : 'div';
+            const linkProps = item.href ? { href: item.href, target: '_blank', rel: 'noopener noreferrer' } : {};
+            return (
+              <li key={item.title} className="project-index-item">
+                <Row
+                  {...linkProps}
+                  className="group relative grid grid-cols-[2.5rem_1fr_auto] md:grid-cols-[3rem_1fr_1fr_auto] items-center gap-x-4 gap-y-1 border-b border-gray-200 py-6 before:bg-surface-container-low before:content-[''] before:absolute before:inset-0 before:origin-bottom before:scale-y-0 before:transition-transform before:duration-300 before:ease-[cubic-bezier(0.22,1,0.36,1)] hover:before:scale-y-100 [&>*]:relative"
+                >
+                  <span className="text-[10px] font-bold tracking-widest text-gray-400 pl-1">
+                    {String(FEATURED.length + i + 1).padStart(2, '0')}
+                  </span>
+                  <div className="transition-transform duration-300 group-hover:translate-x-1">
+                    <p className="text-base md:text-lg font-bold uppercase tracking-tight text-black">{item.title}</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mt-1">{item.meta}</p>
+                  </div>
+                  <p className="hidden md:block text-sm text-gray-500 md:text-right">{item.summary}</p>
+                  <span
+                    className={`text-[10px] font-bold uppercase tracking-widest border px-2.5 py-1 transition-colors duration-300 mr-1 whitespace-nowrap ${
+                      item.href
+                        ? 'border-black bg-black text-white group-hover:bg-white group-hover:text-black'
+                        : 'border-gray-300 text-gray-500'
+                    }`}
+                  >
+                    {item.status}
+                    {item.href && ' ↗'}
+                  </span>
+                </Row>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
